@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LevelUp - Tienda Gamer</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: #201711;
+            --accent-blue: #1E90FF;
+            --accent-green: #ffc814;
+            --text-primary: #f17f14;
+            --text-secondary: #D3D3D3;
+        }
+        
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .navbar-brand {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            color: var(--accent-green) !important;
+            font-size: 1.8rem;
+        }
+        
+        .nav-link {
+            transition: color 0.3s;
+        }
+        
+        .nav-link:hover {
+            color: var(--accent-blue) !important;
+        }
+        
+        .btn-primary {
+            background-color: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+        
+        .btn-success {
+            background-color: var(--accent-green);
+            border-color: var(--accent-green);
+            color: #000;
+        }
+        
+        .hero-section {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(223, 95, 21, 0.7)), 
+                        url('assets/images/fondo.jpeg') no-repeat center center;
+            background-size: cover;
+            padding: 120px 0;
+        }
+
+        
+        .product-card {
+            background-color: #111;
+            border: 1px solid #222;
+            transition: transform 0.3s, box-shadow 0.3s;
+            height: 100%;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(57, 255, 20, 0.1);
+            border-color: var(--accent-green);
+        }
+        
+        .product-price {
+            color: var(--accent-green);
+            font-weight: bold;
+        }
+        
+        .footer {
+            background-color: #111;
+            border-top: 1px solid var(--accent-blue);
+            padding: 40px 0;
+        }
+        
+        .social-icon {
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            margin-right: 15px;
+            transition: color 0.3s;
+        }
+        
+        .social-icon:hover {
+            color: var(--accent-blue);
+        }
+        
+        .category-filter {
+            background-color: #111;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .category-btn {
+            background-color: #222;
+            color: var(--text-primary);
+            border: none;
+            margin: 5px;
+            transition: all 0.3s;
+        }
+        
+        .category-btn:hover, .category-btn.active {
+            background-color: var(--accent-blue);
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar actualizada con Bootstrap oficial -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top border-bottom border-primary">
+        <div class="container">
+            <a class="navbar-brand" ="#"href>
+                <i class="fa-solid fa-paw"></i> PuppyPet
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="Home.html">HOME</a>
+                    </li>
+<li class="nav-item dropdown">
+   
+    <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="perros.html">Catálogo de Perros</a></li>
+        <li><a class="dropdown-item" href="gatos.html">Catálogo de Gatos</a></li>
+    </ul>
+</li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="registro.html">REGISTRO USUARIO</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="login.html">INICIAR SESIÓN</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="sobreNosotros.html">NOSOTROS</a>
+                    </li>                  
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="contacto.html">CONTACTO</a>
+                    </li>
+                </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Seccion -->
+     
+    <section class="hero-section text-center">
+        <div class="container">
+            <h1 class="display-3 fw-bold mb-4">BIENVENIDO A PUPPYPET</h1>
+            <p class="lead mb-4">Todo lo que necesitas para el cuidado de tus mascotas en un solo lugar</p>
+            <a href="registro.html" class="btn btn-outline-light btn-lg">REGISTRARSE</a>
+        </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section id="products" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">PRODUCTOS DESTACADOS</h2>
+
+            <section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+
+            <!-- Perros -->
+            <div class="col-md-3">
+                <a href="perros.html" class="text-decoration-none">
+                    <div class="card category-card">
+                        <img src="assets/images/perro.jpg" class="card-img-top" alt="Perros">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Productos para perros</h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Gatos -->
+            <div class="col-md-3">
+                <a href="gatos.html" class="text-decoration-none">
+                    <div class="card category-card">
+                        <img src="assets/images/gato.png" class="card-img-top" alt="Gatos">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Productos para gatos</h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+                        <!-- Aves -->
+            <div class="col-md-3">
+                <a href="aves.html" class="text-decoration-none">
+                    <div class="card category-card">
+                        <img src="assets/images/snack.jpg" class="card-img-top" alt="Aves">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Snack</h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Otros -->
+            <div class="col-md-3">
+                <a href="otros.html" class="text-decoration-none">
+                    <div class="card category-card">
+                        <img src="assets/images/accesorios.jpg" class="card-img-top" alt="Otros">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Accesorios</h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
+                                    <!-- Aves -->
+            <div class="col-md-3">
+                <a href="aves.html" class="text-decoration-none">
+                    <div class="card category-card">
+                        <img src="assets/images/higiene.webp" class="card-img-top" alt="Aves">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Higiene</h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Otros -->
+            <div class="col-md-3">
+                <a href="otros.html" class="text-decoration-none">
+                    <div class="card category-card">
+                        <img src="assets/images/juguetes.jpg" class="card-img-top" alt="Otros">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Juguetes</h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
+                <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h4>PuppyPet</h4>
+                    <p class="text-secondary">Tu tienda especializada en productos de excelente calidad y los mejores precios del mercado.</p>
+                    <div>
+                        <a href="https://www.facebook.com/?locale=es_LA" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+						<a href="https://x.com/?lang=es" class="social-icon"><i class="fa-brands fa-square-twitter"></i></a>
+                        <a href="https://www.instagram.com/" class="social-icon"><i class="fab fa-instagram"></i></a>
+                        <a href="https://discord.com/" class="social-icon"><i class="fab fa-discord"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-2 mb-4">
+        </div>
+    </div>
+              <div class="col-md-3 mb-4">
+                    <h5>Contacto</h5>
+                    <ul class="list-unstyled">
+                        <li class="text-secondary"><i class="fas fa-map-marker-alt me-2"></i> Av. Siempre Viva 742, Santiago</li>
+                        <li class="text-secondary"><i class="fas fa-phone me-2"></i> +56 2 2345 6789</li>
+                        <li class="text-secondary"><i class="fas fa-envelope me-2"></i> info@PuppyPet.cl</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4 bg-secondary">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="text-secondary">&copy; 2026 PuppyPet. Todos los derechos reservados. - Diseñado por Ale^2</p>
+                   
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <i class="fa-brands fa-cc-mastercard"></i> Mastercard 
+					<i class="fa-brands fa-cc-visa"></i> Visa 
+					<i class="fa-brands fa-paypal"></i> Paypal 
+                   
+                </div>
+</section>
