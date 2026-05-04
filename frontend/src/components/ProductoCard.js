@@ -1,46 +1,51 @@
 import { Card, Button, Badge } from "react-bootstrap";
+import { FaCartPlus } from "react-icons/fa";
 
 function ProductoCard({ producto, onAgregar }) {
-    return (
-        <Card className="h-100 shadow-sm producto-card">
-            <Card.Img
-                variant="top"
-                src={producto.imagen_url || "/assets/images/default-producto.png"}
-                alt={producto.nombre_producto}
-                className="producto-img"
-            />
+  return (
+    <Card className="h-100 shadow-sm producto-card producto-card-dark">
+      <Card.Img
+        variant="top"
+        src={producto.imagen_url || "/assets/images/default-producto.png"}
+        alt={producto.nombre_producto}
+        className="producto-img"
+      />
 
-            <Card.Body className="d-flex flex-column">
-                <div className="mb-2">
-                    <Badge bg="secondary">
-                        {producto.nombre_categoria}
-                    </Badge>
-                </div>
+      <Card.Body className="d-flex flex-column text-center">
+        <div className="mb-2">
+          <Badge bg="warning" text="dark">
+            {producto.nombre_categoria}
+          </Badge>
+        </div>
 
-                <Card.Title>{producto.nombre_producto}</Card.Title>
+        <Card.Title className="producto-title">
+          {producto.nombre_producto}
+        </Card.Title>
 
-                <Card.Text className="text-muted">
-                    {producto.descripcion}
-                </Card.Text>
+        <Card.Text className="producto-description">
+          {producto.descripcion}
+        </Card.Text>
 
-                <p className="fw-bold fs-5 mt-auto">
-                    ${producto.precio.toLocaleString("es-CL")}
-                </p>
+        <p className="producto-price mt-auto">
+          ${producto.precio.toLocaleString("es-CL")}
+        </p>
 
-                <p className="small text-muted">
-                    Stock disponible: {producto.stock}
-                </p>
+        <p className="small producto-stock">
+          Stock disponible: {producto.stock}
+        </p>
 
-                <Button
-                    className="btn-puppy w-100"
-                    disabled={producto.stock <= 0}
-                    onClick={() => onAgregar(producto)}
-                >
-                    {producto.stock > 0 ? "Agregar al carrito" : "Sin stock"}
-                </Button>
-            </Card.Body>
-        </Card>
-    );
+        <Button
+          variant="warning"
+          className="w-100 fw-bold"
+          disabled={producto.stock <= 0}
+          onClick={() => onAgregar(producto)}
+        >
+          <FaCartPlus className="me-2" />
+          {producto.stock > 0 ? "Agregar al carrito" : "Sin stock"}
+        </Button>
+      </Card.Body>
+    </Card>
+  );
 }
 
 export default ProductoCard;

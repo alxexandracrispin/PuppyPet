@@ -121,3 +121,159 @@ body {
 .footer-puppy small {
   color: #f7d7bd;
 }
+
+/* Navbar */
+.brand-puppy {
+  letter-spacing: 0.5px;
+}
+
+.main-navbar {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+}
+
+.main-navbar .dropdown-menu {
+  background-color: #fffaf3;
+  border: none;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.12);
+}
+
+.main-navbar .dropdown-item {
+  color: #4b2e24;
+  font-weight: 500;
+}
+
+.main-navbar .dropdown-item:hover {
+  background-color: #f4d7bd;
+  color: #4b2e24;
+}
+
+.cart-link {
+  background-color: rgba(255, 230, 199, 0.15);
+  border-radius: 999px;
+  padding-left: 14px !important;
+  padding-right: 14px !important;
+}
+
+/* Footer */
+.footer-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.footer-subtitle {
+  font-weight: 800;
+  color: #ffe6c7;
+  margin-bottom: 1rem;
+}
+
+.footer-links li {
+  margin-bottom: 0.4rem;
+}
+
+.footer-links a {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  color: #ffe6c7;
+  text-decoration: underline;
+}
+
+.footer-line {
+  border-color: rgba(255, 255, 255, 0.35);
+  margin: 2rem 0 1rem;
+}
+
+.payment-methods {
+  color: #f7d7bd;
+  font-weight: 600;
+}
+
+.brand-puppy {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  letter-spacing: 0.5px;
+  font-size: 1.7rem !important;
+  font-weight: 800 !important;
+}
+
+.brand-icon {
+  font-size: 1.5rem;
+  color: #ffe6c7;
+}
+
+.nav-icon {
+  margin-right: 0.35rem;
+  margin-bottom: 0.15rem;
+  font-size: 0.95rem;
+}
+
+.cart-link {
+  display: flex !important;
+  align-items: center;
+  gap: 0.25rem;
+  background-color: rgba(255, 230, 199, 0.15);
+  border-radius: 999px;
+  padding-left: 14px !important;
+  padding-right: 14px !important;
+  margin-left: 0.4rem;
+}
+
+.footer-icon {
+  margin-right: 0.4rem;
+  color: #ffe6c7;
+}
+
+.footer-list-icon {
+  margin-right: 0.45rem;
+  color: #ffe6c7;
+}
+
+.producto-card-dark {
+  background-color: #111;
+  border: 1px solid #222;
+  color: #fff;
+}
+
+.producto-card-dark:hover {
+  transform: scale(1.03);
+  border-color: #ffc814;
+  box-shadow: 0 0.8rem 1.2rem rgba(0, 0, 0, 0.25);
+}
+
+.producto-title {
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.producto-description {
+  color: #d6d6d6;
+  min-height: 48px;
+}
+
+.producto-price {
+  color: #ffc814;
+  font-weight: 900;
+  font-size: 1.35rem;
+}
+
+.producto-stock {
+  color: #bdbdbd;
+}
+
+.catalogo-wrapper {
+  background-color: #1f1712;
+  color: #fff;
+  border-radius: 24px;
+  padding: 2.5rem;
+}
+
+.catalogo-wrapper .section-title {
+  color: #ffc814;
+}
+
+.catalogo-wrapper .lead {
+  color: #f2dfc8;
+}

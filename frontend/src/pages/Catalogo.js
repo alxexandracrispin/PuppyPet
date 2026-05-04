@@ -96,12 +96,12 @@ function Catalogo() {
                 subtitulo: "Productos prácticos para el cuidado diario"
             },
             Higiene: {
-                titulo: "Higiene",
-                subtitulo: "Productos para mantener a tus mascotas limpias y saludables"
+                titulo: "Higiene para Mascotas",
+                subtitulo: "Todo para mantener a tu mascota limpia y saludable"
             },
             Juguetes: {
-                titulo: "Juguetes",
-                subtitulo: "Entretención y estimulación para tus mascotas"
+                titulo: "Juguetes para Mascotas",
+                subtitulo: "Diversión asegurada para tu mejor amigo"
             }
         };
 
@@ -110,45 +110,48 @@ function Catalogo() {
             subtitulo: "Productos disponibles"
         };
     };
-
     const encabezado = obtenerTituloCategoria();
 
     return (
         <Container className="py-5">
-            <div className="text-center mb-5">
-                <h1 className="section-title mb-2">{encabezado.titulo}</h1>
-                <p className="lead">{encabezado.subtitulo}</p>
-            </div>
-
-            {cargando && (
-                <div className="text-center py-5">
-                    <Spinner animation="border" />
-                    <p className="mt-3">Cargando productos...</p>
+            <div className="catalogo-wrapper">
+                <div className="text-center mb-5">
+                    <h1 className="section-title mb-2">{encabezado.titulo}</h1>
+                    <p className="lead">{encabezado.subtitulo}</p>
                 </div>
-            )}
 
-            {error && (
-                <Alert variant="danger">
-                    {error}
-                </Alert>
-            )}
+                {cargando && (
+                    <div className="text-center py-5">
+                        <Spinner animation="border" />
+                        <p className="mt-3">Cargando productos...</p>
+                    </div>
+                )}
 
-            {!cargando && !error && productos.length === 0 && (
-                <Alert variant="warning">
-                    No hay productos disponibles para esta categoría.
-                </Alert>
-            )}
+                {error && (
+                    <Alert variant="danger">
+                        {error}
+                    </Alert>
+                )}
 
-            <Row>
-                {productos.map((producto) => (
-                    <Col md={4} lg={3} className="mb-4" key={producto.id_producto}>
-                        <ProductoCard
-                            producto={producto}
-                            onAgregar={agregarAlCarrito}
-                        />
-                    </Col>
-                ))}
-            </Row>
+                {!cargando && !error && productos.length === 0 && (
+                    <Alert variant="warning">
+                        No hay productos disponibles para esta categoría.
+                    </Alert>
+                )}
+
+                {!cargando && !error && productos.length > 0 && (
+                    <Row>
+                        {productos.map((producto) => (
+                            <Col md={4} lg={3} className="mb-4" key={producto.id_producto}>
+                                <ProductoCard
+                                    producto={producto}
+                                    onAgregar={agregarAlCarrito}
+                                />
+                            </Col>
+                        ))}
+                    </Row>
+                )}
+            </div>
         </Container>
     );
 }

@@ -44,12 +44,12 @@ function Home() {
   return (
     <>
       <section
-  className="hero-section"
-  style={{
-    backgroundImage:
-      'linear-gradient(rgba(75, 46, 36, 0.55), rgba(75, 46, 36, 0.55)), url("/assets/images/fondo.jpeg")'
-  }}
->
+        className="hero-section"
+        style={{
+          backgroundImage:
+            'linear-gradient(rgba(75, 46, 36, 0.55), rgba(75, 46, 36, 0.55)), url("/assets/images/fondo.jpeg")'
+        }}
+      >
         <Container className="text-center">
           <h1 className="hero-title">BIENVENIDO A PUPPYPET</h1>
 
