@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Higiene - PuppyPet</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            background-color: #1f1712;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        .card {
+            background-color: #111;
+            border: 1px solid #222;
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            border-color: #ffc814;
+        }
+
+        .price {
+            color: #ffc814;
+            font-weight: bold;
+        }
+
+        .footer {
+            background-color: #111;
+            padding: 30px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR CON CARRITO -->
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container d-flex justify-content-between">
+        <a href="Home.html" class="navbar-brand">🐾 PuppyPet</a>
+
+        <button class="btn btn-warning position-relative" onclick="verCarrito()">
+            🛒
+            <span id="contadorCarrito" 
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                0
+            </span>
+        </button>
+    </div>
+</nav>
+
+<!-- TITULO -->
+<div class="container py-5 text-center">
+    <h1>🧼 Higiene para Mascotas</h1>
+    <p>Todo para mantener a tu mascota limpia y saludable</p>
+</div>
+
+<!-- PRODUCTOS -->
+<div class="container pb-5">
+    <div class="row g-4">
+
+        <!-- Producto 1 -->
+        <div class="col-md-4">
+            <div class="card">
+                <img src="assets/images/shampoperro.png" class="card-img-top">
+                <div class="card-body text-center">
+                    <h5>Shampoo para Perros</h5>
+                    <p>Limpieza profunda y aroma agradable.</p>
+                    <p class="price">$5.990</p>
+                    <button class="btn btn-warning" onclick="agregarAlCarrito('Shampoo para Perros', 5990)">
+                        Agregar al carrito
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Producto 2 -->
+        <div class="col-md-4">
+            <div class="card">
+                <img src="assets/images/shampogato.png" class="card-img-top">
+                <div class="card-body text-center">
+                    <h5>Shampoo para Gatos</h5>
+                    <p>Fórmula suave especial para gatos.</p>
+                    <p class="price">$6.490</p>
+                    <button class="btn btn-warning" onclick="agregarAlCarrito('Shampoo para Gatos', 6490)">
+                        Agregar al carrito
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Producto 3 -->
+        <div class="col-md-4">
+            <div class="card">
+                <img src="assets/images/toallahumeda.png" class="card-img-top">
+                <div class="card-body text-center">
+                    <h5>Toallitas Húmedas</h5>
+                    <p>Limpieza rápida sin necesidad de agua.</p>
+                    <p class="price">$3.990</p>
+                    <button class="btn btn-warning" onclick="agregarAlCarrito('Toallitas Húmedas', 3990)">
+                        Agregar al carrito
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Producto 4 -->
+        <div class="col-md-4">
+            <div class="card">
+                <img src="assets/images/arena.png" class="card-img-top">
+                <div class="card-body text-center">
+                    <h5>Arena Sanitaria</h5>
+                    <p>Control de olores para gatos.</p>
+                    <p class="price">$8.990</p>
+                    <button class="btn btn-warning" onclick="agregarAlCarrito('Arena Sanitaria', 8990)">
+                        Agregar al carrito
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Producto 5 -->
+        <div class="col-md-4">
+            <div class="card">
+                <img src="assets/images/cepillo.png" class="card-img-top">
+                <div class="card-body text-center">
+                    <h5>Cepillo para Mascotas</h5>
+                    <p>Elimina pelo muerto fácilmente.</p>
+                    <p class="price">$4.990</p>
+                    <button class="btn btn-warning" onclick="agregarAlCarrito('Cepillo para Mascotas', 4990)">
+                        Agregar al carrito
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Producto 6 -->
+        <div class="col-md-4">
+            <div class="card">
+                <img src="assets/images/cortauñas.png" class="card-img-top">
+                <div class="card-body text-center">
+                    <h5>Corta Uñas</h5>
+                    <p>Seguro y fácil de usar.</p>
+                    <p class="price">$3.490</p>
+                    <button class="btn btn-warning" onclick="agregarAlCarrito('Corta Uñas', 3490)">
+                        Agregar al carrito
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- VOLVER -->
+<div class="text-center pb-5">
+    <a href="Home.html" class="btn btn-light">⬅ Volver al inicio</a>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer text-center">
+    <p class="text-secondary">© 2026 PuppyPet - Diseñado por Ale^2</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- CARRITO -->
+<script>
+let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+
+function agregarAlCarrito(nombre, precio) {
+    const producto = carrito.find(p => p.nombre === nombre);
+
+    if (producto) {
+        producto.cantidad++;
+    } else {
+        carrito.push({ nombre, precio, cantidad: 1 });
+    }
+
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+    actualizarContador();
+    alert(nombre + " agregado al carrito 🛒");
+}
+
+function actualizarContador() {
+    const total = carrito.reduce((acc, item) => acc + item.cantidad, 0);
+    document.getElementById("contadorCarrito").textContent = total;
+}
+
+function verCarrito() {
+    let mensaje = "🛒 Carrito:\n\n";
+
+    carrito.forEach(item => {
+        mensaje += `${item.nombre} x${item.cantidad} - $${item.precio * item.cantidad}\n`;
+    });
+
+    alert(mensaje);
+}
+
+actualizarContador();
+</script>
+
+</body>
+</html>
