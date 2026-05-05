@@ -1,5 +1,25 @@
-INSERT INTO usuario (nombre, apellido, correo, password, rol)
-VALUES ('Administrador', 'PuppyPet', 'admin@puppypet.cl', '123456', 'ADMIN');
+INSERT INTO usuario (
+    nombre,
+    apellido,
+    rut,
+    correo,
+    password,
+    direccion,
+    comuna,
+    ciudad,
+    rol
+)
+VALUES (
+    'Administrador',
+    'PuppyPet',
+    '11111111-1',
+    'admin@puppypet.cl',
+    '123456',
+    'Av. Principal 123',
+    'Puente Alto',
+    'Santiago',
+    'ADMIN'
+);
 
 INSERT INTO empresa_emisora (
     rut_emisor,

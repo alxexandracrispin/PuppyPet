@@ -496,3 +496,56 @@ body {
     font-size: 1.45rem;
   }
 }
+
+/* Registro */
+.registro-wrapper {
+  background-color: #1f1712;
+  color: #ffffff;
+  border-radius: 24px;
+  padding: 2.5rem;
+}
+
+.registro-card {
+  background-color: #111;
+  border: 1px solid #2a211c;
+  color: #ffffff;
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.registro-card .form-label {
+  color: #f2dfc8;
+  font-weight: 700;
+}
+
+.registro-card .form-control {
+  background-color: #1c1c1c;
+  border: 1px solid #333;
+  color: #ffffff;
+}
+
+.registro-card .form-control:focus {
+  background-color: #1c1c1c;
+  color: #ffffff;
+  border-color: #ffc814;
+  box-shadow: 0 0 0 0.2rem rgba(255, 200, 20, 0.2);
+}
+
+.registro-card .form-control::placeholder {
+  color: #999999;
+}
+
+.registro-icon {
+  color: #ffc814;
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.registro-title {
+  color: #ffc814;
+  font-weight: 900;
+}
+
+.registro-subtitle {
+  color: #dddddd;
+}
