@@ -9,13 +9,17 @@ DROP TABLE IF EXISTS cliente;
 DROP TABLE IF EXISTS empresa_emisora;
 DROP TABLE IF EXISTS usuario;
 
-CREATE TABLE usuario (
+CREATE TABLE IF NOT EXISTS usuario (
     id_usuario INTEGER PRIMARY KEY AUTOINCREMENT,
     nombre TEXT NOT NULL,
     apellido TEXT NOT NULL,
+    rut TEXT NOT NULL,
     correo TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
-    rol TEXT NOT NULL,
+    direccion TEXT NOT NULL,
+    comuna TEXT NOT NULL,
+    ciudad TEXT NOT NULL,
+    rol TEXT DEFAULT 'CLIENTE',
     estado TEXT DEFAULT 'ACTIVO'
 );
 

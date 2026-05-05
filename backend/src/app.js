@@ -1,3 +1,4 @@
+const usuarioRoutes = require("./routes/usuarioRoutes");
 const express = require("express");
 const cors = require("cors");
 
@@ -21,6 +22,7 @@ app.get("/", (req, res) => {
 app.use("/api/productos", productoRoutes);
 app.use("/api/categorias", categoriaRoutes);
 app.use("/api/ventas", ventaRoutes);
+app.use("/api/usuarios", usuarioRoutes);
 
 app.listen(PORT, () => {
   console.log(`Servidor backend corriendo en http://localhost:${PORT}`);
