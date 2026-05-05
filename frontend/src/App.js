@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-
+import ProductoDetalle from "./pages/ProductoDetalle";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Catalogo from "./pages/Catalogo";
@@ -27,6 +27,8 @@ function App() {
           <Route path="registro" element={<Registro />} />
           <Route path="nosotros" element={<Nosotros />} />
           <Route path="contacto" element={<Contacto />} />
+
+          <Route path="producto/:idProducto" element={<ProductoDetalle />} />
 
           <Route path="*" element={<Navigate to="/" />} />
         </Route>

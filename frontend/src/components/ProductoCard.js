@@ -1,5 +1,6 @@
 import { Card, Button, Badge } from "react-bootstrap";
 import { FaCartPlus } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 function ProductoCard({ producto, onAgregar }) {
   return (
@@ -19,7 +20,12 @@ function ProductoCard({ producto, onAgregar }) {
         </div>
 
         <Card.Title className="producto-title">
-          {producto.nombre_producto}
+          <Link
+            to={`/producto/${producto.id_producto}`}
+            className="producto-title-link"
+          >
+            {producto.nombre_producto}
+          </Link>
         </Card.Title>
 
         <Card.Text className="producto-description">
