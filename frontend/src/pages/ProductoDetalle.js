@@ -49,15 +49,15 @@ function ProductoDetalle() {
     const imagenesPorCategoria = {
       Perros: [
         imagenPrincipal,
-        "/assets/images/dogchow.avif",
-        "/assets/images/pedigree.png",
-        "/assets/images/royal.webp"
+        "/assets/images/pedi3.png",
+        "/assets/images/royal3.png",
+        "/assets/images/dogchow3.png"
       ],
       Gatos: [
         imagenPrincipal,
-        "/assets/images/whiskas.avif",
-        "/assets/images/catchow.avif",
-        "/assets/images/royalcat.avif"
+        "/assets/images/wisk3.png",
+        "/assets/images/royalgato3.png",
+        "/assets/images/catsh3.png"
       ],
       Snack: [
         imagenPrincipal,
