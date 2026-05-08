@@ -67,7 +67,7 @@ const UsuarioModel = {
     db.get(sql, [correo], callback);
   },
 
-  obtenerPorId: (idUsuario, callback) => {
+   obtenerPorId: (idUsuario, callback) => {
     const sql = `
       SELECT
         id_usuario,
@@ -86,6 +86,34 @@ const UsuarioModel = {
     `;
 
     db.get(sql, [idUsuario], callback);
+  },
+
+  actualizarDatosUsuario: (idUsuario, datos, callback) => {
+    const sql = `
+      UPDATE usuario
+      SET
+        nombre = ?,
+        apellido = ?,
+        correo = ?,
+        direccion = ?,
+        comuna = ?,
+        ciudad = ?
+      WHERE id_usuario = ?
+    `;
+
+    const params = [
+      datos.nombre,
+      datos.apellido,
+      datos.correo,
+      datos.direccion,
+      datos.comuna,
+      datos.ciudad,
+      idUsuario
+    ];
+
+    db.run(sql, params, function (error) {
+      callback(error, this?.changes);
+    });
   }
 };
 

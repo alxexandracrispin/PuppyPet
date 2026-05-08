@@ -1,5 +1,67 @@
 const UsuarioModel = require("../models/usuarioModel");
 
+const limpiarRut = (rut) => {
+  return rut.replace(/\./g, "").replace(/-/g, "").toUpperCase();
+};
+
+const calcularDv = (rutNumerico) => {
+  let suma = 0;
+  let multiplicador = 2;
+
+  for (let i = rutNumerico.length - 1; i >= 0; i--) {
+    suma += parseInt(rutNumerico.charAt(i), 10) * multiplicador;
+    multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
+  }
+
+  const resto = suma % 11;
+  const dvCalculado = 11 - resto;
+
+  if (dvCalculado === 11) return "0";
+  if (dvCalculado === 10) return "K";
+
+  return dvCalculado.toString();
+};
+
+const validarRut = (rut) => {
+  if (!rut) return false;
+
+  const rutLimpio = limpiarRut(rut);
+
+  if (rutLimpio.length < 2) return false;
+
+  const cuerpo = rutLimpio.slice(0, -1);
+  const dv = rutLimpio.slice(-1);
+
+  if (!/^\d+$/.test(cuerpo)) return false;
+  if (!/^[0-9K]$/.test(dv)) return false;
+
+  const rutNumero = parseInt(cuerpo, 10);
+
+  if (rutNumero <= 1000000) return false;
+
+  const dvCorrecto = calcularDv(cuerpo);
+
+  return dv === dvCorrecto;
+};
+
+const validarPasswordSegura = (password) => {
+  if (!password) return false;
+
+  const tieneMinimo8 = password.length >= 8;
+  const tieneMayuscula = /[A-Z]/.test(password);
+  const tieneMinuscula = /[a-z]/.test(password);
+  const tieneNumero = /[0-9]/.test(password);
+  const tieneSimbolo = /[^A-Za-z0-9]/.test(password);
+
+  return (
+    tieneMinimo8 &&
+    tieneMayuscula &&
+    tieneMinuscula &&
+    tieneNumero &&
+    tieneSimbolo
+  );
+};
+
 const UsuarioController = {
   obtenerUsuarios: (req, res) => {
     UsuarioModel.obtenerTodos((error, usuarios) => {
@@ -40,6 +102,20 @@ const UsuarioController = {
     ) {
       return res.status(400).json({
         mensaje: "Todos los campos son obligatorios"
+      });
+    }
+
+    if (!validarRut(rut)) {
+      return res.status(400).json({
+        mensaje:
+          "El RUT ingresado no es válido. Debe ser mayor a 1.000.000 y respetar el dígito verificador."
+      });
+    }
+
+    if (!validarPasswordSegura(password)) {
+      return res.status(400).json({
+        mensaje:
+          "La contraseña debe tener mínimo 8 caracteres, incluir mayúscula, minúscula, número y símbolo."
       });
     }
 
@@ -100,6 +176,171 @@ const UsuarioController = {
             estado: "ACTIVO"
           }
         });
+      });
+    });
+  },
+
+  loginUsuario: (req, res) => {
+   
+
+    const { correo, password } = req.body || {};
+
+    if (!correo || !password) {
+      return res.status(400).json({
+        mensaje: "Correo y contraseña son obligatorios"
+      });
+    }
+
+    UsuarioModel.buscarPorCorreo(correo, (errorBuscar, usuario) => {
+      console.log("Resultado buscarPorCorreo:", errorBuscar, usuario ? {
+        id_usuario: usuario.id_usuario,
+        correo: usuario.correo,
+        rol: usuario.rol,
+        estado: usuario.estado
+      } : null);
+
+      if (errorBuscar) {
+        return res.status(500).json({
+          mensaje: "Error al validar usuario",
+          error: errorBuscar.message
+        });
+      }
+
+      if (!usuario) {
+        return res.status(401).json({
+          mensaje: "Correo o contraseña incorrectos"
+        });
+      }
+
+      if (usuario.password !== password) {
+        return res.status(401).json({
+          mensaje: "Correo o contraseña incorrectos"
+        });
+      }
+
+      return res.status(200).json({
+        mensaje: "Inicio de sesión correcto",
+        usuario: {
+          idUsuario: usuario.id_usuario,
+          nombre: usuario.nombre,
+          apellido: usuario.apellido,
+          rut: usuario.rut,
+          correo: usuario.correo,
+          direccion: usuario.direccion,
+          comuna: usuario.comuna,
+          ciudad: usuario.ciudad,
+          rol: usuario.rol,
+          estado: usuario.estado
+        }
+      });
+    });
+  },
+
+  actualizarUsuario: (req, res) => {
+    const { id } = req.params;
+
+    const {
+      nombre,
+      apellido,
+      correo,
+      direccion,
+      comuna,
+      ciudad
+    } = req.body || {};
+
+    if (!id) {
+      return res.status(400).json({
+        mensaje: "Debe indicar el ID del usuario"
+      });
+    }
+
+    if (
+      !nombre ||
+      !apellido ||
+      !correo ||
+      !direccion ||
+      !comuna ||
+      !ciudad
+    ) {
+      return res.status(400).json({
+        mensaje: "Todos los campos editables son obligatorios"
+      });
+    }
+
+    UsuarioModel.obtenerPorId(id, (errorBuscar, usuarioExistente) => {
+      if (errorBuscar) {
+        return res.status(500).json({
+          mensaje: "Error al buscar usuario",
+          error: errorBuscar.message
+        });
+      }
+
+      if (!usuarioExistente) {
+        return res.status(404).json({
+          mensaje: "Usuario no encontrado"
+        });
+      }
+
+      UsuarioModel.buscarPorCorreo(correo, (errorCorreo, usuarioCorreo) => {
+        if (errorCorreo) {
+          return res.status(500).json({
+            mensaje: "Error al validar correo",
+            error: errorCorreo.message
+          });
+        }
+
+        if (
+          usuarioCorreo &&
+          Number(usuarioCorreo.id_usuario) !== Number(id)
+        ) {
+          return res.status(400).json({
+            mensaje: "El correo ingresado ya está registrado por otro usuario"
+          });
+        }
+
+        const datosActualizados = {
+          nombre,
+          apellido,
+          correo,
+          direccion,
+          comuna,
+          ciudad
+        };
+
+        UsuarioModel.actualizarDatosUsuario(
+          id,
+          datosActualizados,
+          (errorActualizar, cambios) => {
+            if (errorActualizar) {
+              return res.status(500).json({
+                mensaje: "Error al actualizar usuario",
+                error: errorActualizar.message
+              });
+            }
+
+            if (cambios === 0) {
+              return res.status(400).json({
+                mensaje: "No se realizaron cambios en el usuario"
+              });
+            }
+
+            return res.status(200).json({
+              mensaje: "Datos del usuario actualizados correctamente",
+              usuario: {
+                idUsuario: Number(id),
+                rut: usuarioExistente.rut,
+                nombre,
+                apellido,
+                correo,
+                direccion,
+                comuna,
+                ciudad,
+                rol: usuarioExistente.rol,
+                estado: usuarioExistente.estado
+              }
+            });
+          }
+        );
       });
     });
   }
