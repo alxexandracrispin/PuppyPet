@@ -16,7 +16,7 @@ function Footer() {
               mejores precios para el cuidado de tus mascotas.
             </p>
             <small>
-              Proyecto académico de punto de venta con generación de boleta XML.
+              Proyecto académico de punto de venta con generación de boleta XML e impresión ficticia en HTML.
             </small>
           </Col>
 
@@ -58,7 +58,7 @@ function Footer() {
 
         <div className="text-center">
           <small>
-            © 2026 PuppyPet. Todos los derechos reservados. Diseñado por Ale².
+            © 2026 PuppyPet. Todos los derechos reservados. Diseñado por Ale² (Alexandra Crispin - Alejandro Gonzalez).
           </small>
         </div>
       </Container>

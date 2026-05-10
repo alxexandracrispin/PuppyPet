@@ -8,7 +8,7 @@ import VentaConfirmada from "./pages/VentaConfirmada";
 import Login from "./pages/Login";
 import Registro from "./pages/Registro";
 import Nosotros from "./pages/Nosotros";
-import Contacto from "./pages/Contacto";
+
 import Perfil from "./pages/MiPerfil";
 import MisCompras from "./pages/MisCompras";
 
@@ -31,7 +31,7 @@ function App() {
           <Route path="perfil" element={<Perfil />} />
           <Route path="mis-compras" element={<MisCompras />} />
           <Route path="nosotros" element={<Nosotros />} />
-          <Route path="contacto" element={<Contacto />} />
+          
 
           <Route path="producto/:idProducto" element={<ProductoDetalle />} />
           
