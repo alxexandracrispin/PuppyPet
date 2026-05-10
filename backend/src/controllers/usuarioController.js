@@ -1,4 +1,5 @@
 const UsuarioModel = require("../models/usuarioModel");
+const bcrypt = require("bcryptjs");
 
 const limpiarRut = (rut) => {
   return rut.replace(/\./g, "").replace(/-/g, "").toUpperCase();
@@ -139,12 +140,14 @@ const UsuarioController = {
         });
       }
 
+      const passwordEncriptada = bcrypt.hashSync(password, 10);
+
       const nuevoUsuario = {
         nombre,
         apellido,
         rut,
         correo,
-        password,
+        password: passwordEncriptada,
         direccion,
         comuna,
         ciudad,
@@ -181,8 +184,6 @@ const UsuarioController = {
   },
 
   loginUsuario: (req, res) => {
-   
-
     const { correo, password } = req.body || {};
 
     if (!correo || !password) {
@@ -192,12 +193,18 @@ const UsuarioController = {
     }
 
     UsuarioModel.buscarPorCorreo(correo, (errorBuscar, usuario) => {
-      console.log("Resultado buscarPorCorreo:", errorBuscar, usuario ? {
-        id_usuario: usuario.id_usuario,
-        correo: usuario.correo,
-        rol: usuario.rol,
-        estado: usuario.estado
-      } : null);
+      console.log(
+        "Resultado buscarPorCorreo:",
+        errorBuscar,
+        usuario
+          ? {
+            id_usuario: usuario.id_usuario,
+            correo: usuario.correo,
+            rol: usuario.rol,
+            estado: usuario.estado
+          }
+          : null
+      );
 
       if (errorBuscar) {
         return res.status(500).json({
@@ -212,7 +219,9 @@ const UsuarioController = {
         });
       }
 
-      if (usuario.password !== password) {
+      const passwordCorrecta = bcrypt.compareSync(password, usuario.password);
+
+      if (!passwordCorrecta) {
         return res.status(401).json({
           mensaje: "Correo o contraseña incorrectos"
         });
@@ -342,6 +351,91 @@ const UsuarioController = {
           }
         );
       });
+    });
+  }, 
+    actualizarPassword: (req, res) => {
+    const { id } = req.params;
+
+    const {
+      passwordActual,
+      nuevaPassword,
+      confirmarNuevaPassword
+    } = req.body || {};
+
+    if (!id) {
+      return res.status(400).json({
+        mensaje: "Debe indicar el ID del usuario"
+      });
+    }
+
+    if (!passwordActual || !nuevaPassword || !confirmarNuevaPassword) {
+      return res.status(400).json({
+        mensaje: "Todos los campos de contraseña son obligatorios"
+      });
+    }
+
+    if (nuevaPassword !== confirmarNuevaPassword) {
+      return res.status(400).json({
+        mensaje: "La nueva contraseña y su confirmación no coinciden"
+      });
+    }
+
+    if (!validarPasswordSegura(nuevaPassword)) {
+      return res.status(400).json({
+        mensaje:
+          "La nueva contraseña debe tener mínimo 8 caracteres, incluir mayúscula, minúscula, número y símbolo."
+      });
+    }
+
+    UsuarioModel.obtenerPorIdConPassword(id, (errorBuscar, usuario) => {
+      if (errorBuscar) {
+        return res.status(500).json({
+          mensaje: "Error al buscar usuario",
+          error: errorBuscar.message
+        });
+      }
+
+      if (!usuario) {
+        return res.status(404).json({
+          mensaje: "Usuario no encontrado"
+        });
+      }
+
+      const passwordActualCorrecta = bcrypt.compareSync(
+        passwordActual,
+        usuario.password
+      );
+
+      if (!passwordActualCorrecta) {
+        return res.status(401).json({
+          mensaje: "La contraseña actual no es correcta"
+        });
+      }
+
+      const nuevaPasswordEncriptada = bcrypt.hashSync(nuevaPassword, 10);
+
+      UsuarioModel.actualizarPassword(
+        id,
+        nuevaPasswordEncriptada,
+        (errorActualizar, cambios) => {
+          if (errorActualizar) {
+            return res.status(500).json({
+              mensaje: "Error al actualizar contraseña",
+              error: errorActualizar.message
+            });
+          }
+
+          if (cambios === 0) {
+            return res.status(400).json({
+              mensaje: "No se realizaron cambios en la contraseña"
+            });
+          }
+
+          return res.status(200).json({
+            mensaje: "Contraseña actualizada correctamente"
+          });
+        }
+      );
     });
   }
 };
