@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS movimiento_inventario;
 DROP TABLE IF EXISTS hecho_venta;
 DROP TABLE IF EXISTS dim_cliente_tipo;
 DROP TABLE IF EXISTS dim_tiempo;
@@ -13,6 +14,7 @@ DROP TABLE IF EXISTS categoria;
 DROP TABLE IF EXISTS cliente;
 DROP TABLE IF EXISTS empresa_emisora;
 DROP TABLE IF EXISTS usuario;
+
 
 CREATE TABLE IF NOT EXISTS usuario (
     id_usuario INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -72,6 +74,22 @@ CREATE TABLE producto (
     estado TEXT DEFAULT 'ACTIVO',
     id_categoria INTEGER NOT NULL,
     FOREIGN KEY (id_categoria) REFERENCES categoria(id_categoria)
+);
+
+CREATE TABLE movimiento_inventario (
+    id_movimiento INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_producto INTEGER NOT NULL,
+    id_usuario INTEGER,
+    tipo_movimiento TEXT NOT NULL,
+    cantidad INTEGER NOT NULL,
+    stock_anterior INTEGER NOT NULL,
+    stock_nuevo INTEGER NOT NULL,
+    motivo TEXT NOT NULL,
+    observacion TEXT,
+    fecha_movimiento TEXT DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (id_producto) REFERENCES producto(id_producto),
+    FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario)
 );
 
 CREATE TABLE venta (
