@@ -549,3 +549,102 @@ body {
 .registro-subtitle {
   color: #dddddd;
 }
+
+.boleta-ticket {
+  width: 320px;
+  margin: 0 auto;
+  padding: 16px;
+  background: #ffffff;
+  color: #000000;
+  font-family: "Courier New", monospace;
+  font-size: 13px;
+  border: 1px solid #cccccc;
+}
+
+.boleta-header,
+.boleta-info,
+.boleta-footer {
+  text-align: center;
+}
+
+.boleta-header h2 {
+  font-size: 18px;
+  margin-bottom: 6px;
+}
+
+.boleta-info h3 {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.boleta-ticket p {
+  margin: 2px 0;
+}
+
+.boleta-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.boleta-tabla th,
+.boleta-tabla td {
+  padding: 4px 2px;
+  border-bottom: 1px dashed #999999;
+}
+
+.boleta-tabla th:nth-child(1),
+.boleta-tabla td:nth-child(1) {
+  text-align: left;
+}
+
+.boleta-tabla th:nth-child(2),
+.boleta-tabla td:nth-child(2) {
+  text-align: center;
+}
+
+.boleta-tabla th:nth-child(3),
+.boleta-tabla td:nth-child(3) {
+  text-align: right;
+}
+
+.boleta-totales p {
+  display: flex;
+  justify-content: space-between;
+  margin: 4px 0;
+}
+
+.boleta-total-final {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.boleta-nota {
+  font-size: 10px;
+  margin-top: 8px;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .boleta-ticket,
+  .boleta-ticket * {
+    visibility: visible;
+  }
+
+  .boleta-ticket {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80mm;
+    border: none;
+    margin: 0;
+    padding: 8px;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
