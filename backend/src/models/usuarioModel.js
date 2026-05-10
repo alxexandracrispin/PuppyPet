@@ -21,6 +21,28 @@ const UsuarioModel = {
     db.all(sql, [], callback);
   },
 
+  obtenerPorIdConPassword: (idUsuario, callback) => {
+    const sql = `
+    SELECT
+      id_usuario,
+      nombre,
+      apellido,
+      rut,
+      correo,
+      password,
+      direccion,
+      comuna,
+      ciudad,
+      rol,
+      estado
+    FROM usuario
+    WHERE id_usuario = ?
+    LIMIT 1
+  `;
+
+    db.get(sql, [idUsuario], callback);
+  },
+
   crearUsuario: (usuario, callback) => {
     const sql = `
       INSERT INTO usuario (
@@ -67,7 +89,7 @@ const UsuarioModel = {
     db.get(sql, [correo], callback);
   },
 
-   obtenerPorId: (idUsuario, callback) => {
+  obtenerPorId: (idUsuario, callback) => {
     const sql = `
       SELECT
         id_usuario,
@@ -112,6 +134,18 @@ const UsuarioModel = {
     ];
 
     db.run(sql, params, function (error) {
+      callback(error, this?.changes);
+    });
+  },
+
+  actualizarPassword: (idUsuario, passwordEncriptada, callback) => {
+    const sql = `
+    UPDATE usuario
+    SET password = ?
+    WHERE id_usuario = ?
+  `;
+
+    db.run(sql, [passwordEncriptada, idUsuario], function (error) {
       callback(error, this?.changes);
     });
   }

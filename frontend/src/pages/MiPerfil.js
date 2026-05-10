@@ -32,6 +32,13 @@ function MiPerfil() {
   const [cargando, setCargando] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [modalMensaje, setModalMensaje] = useState("");
+  const [cargandoPassword, setCargandoPassword] = useState(false);
+
+  const [formularioPassword, setFormularioPassword] = useState({
+    passwordActual: "",
+    nuevaPassword: "",
+    confirmarNuevaPassword: ""
+  });
 
   const mostrarPopup = (mensaje) => {
     setModalMensaje(mensaje);
@@ -69,6 +76,40 @@ function MiPerfil() {
       [name]: value
     });
   };
+
+  const manejarCambioPassword = (event) => {
+    const { name, value } = event.target;
+
+    setFormularioPassword({
+      ...formularioPassword,
+      [name]: value
+    });
+  };
+
+  const validarPasswordSegura = (password) => {
+    const tieneMinimo8 = password.length >= 8;
+    const tieneMayuscula = /[A-Z]/.test(password);
+    const tieneMinuscula = /[a-z]/.test(password);
+    const tieneNumero = /[0-9]/.test(password);
+    const tieneSimbolo = /[^A-Za-z0-9]/.test(password);
+
+    return (
+      tieneMinimo8 &&
+      tieneMayuscula &&
+      tieneMinuscula &&
+      tieneNumero &&
+      tieneSimbolo
+    );
+  };
+
+  const requisitosPassword = {
+    minimo8: formularioPassword.nuevaPassword.length >= 8,
+    mayuscula: /[A-Z]/.test(formularioPassword.nuevaPassword),
+    minuscula: /[a-z]/.test(formularioPassword.nuevaPassword),
+    numero: /[0-9]/.test(formularioPassword.nuevaPassword),
+    simbolo: /[^A-Za-z0-9]/.test(formularioPassword.nuevaPassword)
+  };
+
 
   const validarCampos = () => {
     if (
@@ -121,7 +162,7 @@ function MiPerfil() {
       };
 
       localStorage.setItem("usuario", JSON.stringify(usuarioActualizado));
-      window.dispatchEvent(new Event("storage"));
+      window.dispatchEvent(new Event("usuarioActualizado"));
 
       setUsuario(usuarioActualizado);
 
@@ -139,6 +180,69 @@ function MiPerfil() {
       mostrarPopup(mensajeBackend);
     } finally {
       setCargando(false);
+    }
+  };
+
+  const cambiarPassword = async (event) => {
+    event.preventDefault();
+
+    if (!usuario?.idUsuario) {
+      mostrarPopup("No se encontró el usuario en sesión.");
+      return;
+    }
+
+    if (
+      !formularioPassword.passwordActual ||
+      !formularioPassword.nuevaPassword ||
+      !formularioPassword.confirmarNuevaPassword
+    ) {
+      mostrarPopup("Todos los campos de contraseña son obligatorios.");
+      return;
+    }
+
+    if (!validarPasswordSegura(formularioPassword.nuevaPassword)) {
+      mostrarPopup(
+        "La nueva contraseña debe tener mínimo 8 caracteres, incluir mayúscula, minúscula, número y símbolo."
+      );
+      return;
+    }
+
+    if (
+      formularioPassword.nuevaPassword !==
+      formularioPassword.confirmarNuevaPassword
+    ) {
+      mostrarPopup("La nueva contraseña y su confirmación no coinciden.");
+      return;
+    }
+
+    try {
+      setCargandoPassword(true);
+
+      const response = await api.put(
+        `/usuarios/${usuario.idUsuario}/password`,
+        formularioPassword
+      );
+
+      setFormularioPassword({
+        passwordActual: "",
+        nuevaPassword: "",
+        confirmarNuevaPassword: ""
+      });
+
+      mostrarPopup(
+        response.data.mensaje || "Contraseña actualizada correctamente."
+      );
+    } catch (error) {
+      console.error("Error al cambiar contraseña:", error);
+
+      const mensajeBackend =
+        error.response?.data?.mensaje ||
+        error.response?.data?.error ||
+        "No se pudo actualizar la contraseña.";
+
+      mostrarPopup(mensajeBackend);
+    } finally {
+      setCargandoPassword(false);
     }
   };
 
@@ -279,27 +383,90 @@ function MiPerfil() {
 
               <hr className="my-4" />
 
-              <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                <div>
-                  <h5 className="mb-1">
-                    <FaLock className="me-2" />
-                    Seguridad
-                  </h5>
-                  <p className="mb-0 text-muted">
-                    Próximo paso: permitir cambio de contraseña.
-                  </p>
-                </div>
+              <div>
+                <h5 className="mb-3">
+                  <FaLock className="me-2" />
+                  Seguridad
+                </h5>
 
-                <Button
-                  variant="outline-secondary"
-                  onClick={() =>
-                    mostrarPopup(
-                      "El cambio de contraseña se implementará en el siguiente paso."
-                    )
-                  }
-                >
-                  Cambiar contraseña
-                </Button>
+                <p className="text-muted">
+                  Cambia tu contraseña ingresando primero la contraseña actual.
+                </p>
+
+                <Form onSubmit={cambiarPassword}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Contraseña actual</Form.Label>
+                    <Form.Control
+                      type="password"
+                      name="passwordActual"
+                      value={formularioPassword.passwordActual}
+                      onChange={manejarCambioPassword}
+                      placeholder="Ingrese su contraseña actual"
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-3">
+                    <Form.Label>Nueva contraseña</Form.Label>
+                    <Form.Control
+                      type="password"
+                      name="nuevaPassword"
+                      value={formularioPassword.nuevaPassword}
+                      onChange={manejarCambioPassword}
+                      placeholder="Ingrese una nueva contraseña"
+                    />
+
+                    {formularioPassword.nuevaPassword && (
+                      <div className="mt-2 small">
+                        <div className={requisitosPassword.minimo8 ? "text-success" : "text-danger"}>
+                          {requisitosPassword.minimo8 ? "✓" : "✗"} Mínimo 8 caracteres
+                        </div>
+
+                        <div className={requisitosPassword.mayuscula ? "text-success" : "text-danger"}>
+                          {requisitosPassword.mayuscula ? "✓" : "✗"} Al menos una letra mayúscula
+                        </div>
+
+                        <div className={requisitosPassword.minuscula ? "text-success" : "text-danger"}>
+                          {requisitosPassword.minuscula ? "✓" : "✗"} Al menos una letra minúscula
+                        </div>
+
+                        <div className={requisitosPassword.numero ? "text-success" : "text-danger"}>
+                          {requisitosPassword.numero ? "✓" : "✗"} Al menos un número
+                        </div>
+
+                        <div className={requisitosPassword.simbolo ? "text-success" : "text-danger"}>
+                          {requisitosPassword.simbolo ? "✓" : "✗"} Al menos un símbolo
+                        </div>
+                      </div>
+                    )}
+                  </Form.Group>
+
+                  <Form.Group className="mb-4">
+                    <Form.Label>Confirmar nueva contraseña</Form.Label>
+                    <Form.Control
+                      type="password"
+                      name="confirmarNuevaPassword"
+                      value={formularioPassword.confirmarNuevaPassword}
+                      onChange={manejarCambioPassword}
+                      placeholder="Repita la nueva contraseña"
+                    />
+                  </Form.Group>
+
+                  <Button
+                    type="submit"
+                    variant="outline-secondary"
+                    className="w-100"
+                    disabled={cargandoPassword}
+                  >
+                    {cargandoPassword ? (
+                      <>
+                        <Spinner animation="border" size="sm" className="me-2" />
+                        Actualizando contraseña...
+                      </>
+                    ) : (
+                      "Cambiar contraseña"
+                    )}
+                  </Button>
+                </Form>
               </div>
             </Card.Body>
           </Card>
