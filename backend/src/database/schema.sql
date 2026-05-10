@@ -1,3 +1,8 @@
+DROP TABLE IF EXISTS hecho_venta;
+DROP TABLE IF EXISTS dim_cliente_tipo;
+DROP TABLE IF EXISTS dim_tiempo;
+DROP TABLE IF EXISTS dim_producto;
+DROP TABLE IF EXISTS dim_categoria;
 DROP TABLE IF EXISTS documento_xml;
 DROP TABLE IF EXISTS detalle_venta;
 DROP TABLE IF EXISTS venta;
@@ -97,6 +102,53 @@ CREATE TABLE detalle_venta (
     subtotal_linea INTEGER NOT NULL,
     FOREIGN KEY (id_venta) REFERENCES venta(id_venta),
     FOREIGN KEY (id_producto) REFERENCES producto(id_producto)
+);
+
+
+CREATE TABLE dim_categoria (
+    id_categoria INTEGER PRIMARY KEY,
+    nombre_categoria TEXT NOT NULL
+);
+
+CREATE TABLE dim_producto (
+    id_producto INTEGER PRIMARY KEY,
+    codigo_interno TEXT,
+    nombre_producto TEXT NOT NULL,
+    precio_referencia INTEGER,
+    estado TEXT
+);
+
+CREATE TABLE dim_tiempo (
+    id_tiempo INTEGER PRIMARY KEY AUTOINCREMENT,
+    fecha TEXT NOT NULL UNIQUE,
+    dia INTEGER NOT NULL,
+    mes INTEGER NOT NULL,
+    anio INTEGER NOT NULL,
+    nombre_mes TEXT NOT NULL
+);
+
+CREATE TABLE dim_cliente_tipo (
+    id_cliente_tipo INTEGER PRIMARY KEY,
+    tipo_cliente TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE hecho_venta (
+    id_hecho INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_venta INTEGER NOT NULL,
+    id_producto INTEGER NOT NULL,
+    id_categoria INTEGER NOT NULL,
+    id_tiempo INTEGER NOT NULL,
+    id_cliente_tipo INTEGER NOT NULL,
+    cantidad INTEGER NOT NULL,
+    precio_unitario INTEGER NOT NULL,
+    subtotal_linea INTEGER NOT NULL,
+    iva_linea INTEGER NOT NULL,
+    total_linea INTEGER NOT NULL,
+    FOREIGN KEY (id_venta) REFERENCES venta(id_venta),
+    FOREIGN KEY (id_producto) REFERENCES dim_producto(id_producto),
+    FOREIGN KEY (id_categoria) REFERENCES dim_categoria(id_categoria),
+    FOREIGN KEY (id_tiempo) REFERENCES dim_tiempo(id_tiempo),
+    FOREIGN KEY (id_cliente_tipo) REFERENCES dim_cliente_tipo(id_cliente_tipo)
 );
 
 CREATE TABLE documento_xml (
