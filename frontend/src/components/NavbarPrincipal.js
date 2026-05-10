@@ -1,5 +1,5 @@
 import { Navbar, Nav, Container, NavDropdown, Badge } from "react-bootstrap";
-import { FaPaw, FaShoppingCart, FaUserPlus, FaSignInAlt } from "react-icons/fa";
+import { FaPaw, FaShoppingCart, FaUserPlus, FaSignInAlt, FaChartBar } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
@@ -103,6 +103,13 @@ function NavbarPrincipal() {
                 <Nav.Link as={Link} to="/mis-compras">
                   MIS COMPRAS
                 </Nav.Link>
+
+                {usuario.rol === "ADMIN" && (
+                  <Nav.Link as={Link} to="/admin">
+                    <FaChartBar className="nav-icon" />
+                    ADMIN
+                  </Nav.Link>
+                )}
 
                 <Nav.Link onClick={cerrarSesion}>
                   CERRAR SESIÓN

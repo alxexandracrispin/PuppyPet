@@ -114,69 +114,79 @@ const VentaController = {
                 procesados++;
 
                 if (procesados === items.length) {
-                  VentaModel.obtenerVentaCompleta(
-                    idVenta,
-                    (errorVentaCompleta, dataVenta) => {
-                      if (errorVentaCompleta) {
-                        db.run("ROLLBACK");
-                        return res.status(500).json({
-                          mensaje: "Error al obtener venta completa",
-                          error: errorVentaCompleta.message
-                        });
-                      }
+                  VentaModel.registrarHechosVenta(idVenta, (errorHechos) => {
+                    if (errorHechos) {
+                      db.run("ROLLBACK");
+                      return res.status(500).json({
+                        mensaje: "Error al registrar hechos de venta para el dashboard",
+                        error: errorHechos.message
+                      });
+                    }
 
-                      if (!dataVenta) {
-                        db.run("ROLLBACK");
-                        return res.status(404).json({
-                          mensaje: "No se encontró la venta generada"
-                        });
-                      }
+                    VentaModel.obtenerVentaCompleta(
+                      idVenta,
+                      (errorVentaCompleta, dataVenta) => {
+                        if (errorVentaCompleta) {
+                          db.run("ROLLBACK");
+                          return res.status(500).json({
+                            mensaje: "Error al obtener venta completa",
+                            error: errorVentaCompleta.message
+                          });
+                        }
 
-                      const contenidoXml = generarXmlBoleta(dataVenta);
-                      const nombreArchivo = `boleta_${idVenta}.xml`;
+                        if (!dataVenta) {
+                          db.run("ROLLBACK");
+                          return res.status(404).json({
+                            mensaje: "No se encontró la venta generada"
+                          });
+                        }
 
-                      DocumentoXmlModel.guardarXml(
-                        idVenta,
-                        nombreArchivo,
-                        contenidoXml,
-                        (errorXml, idDocumentoXml) => {
-                          if (errorXml) {
-                            db.run("ROLLBACK");
-                            return res.status(500).json({
-                              mensaje: "Error al guardar XML",
-                              error: errorXml.message
-                            });
-                          }
+                        const contenidoXml = generarXmlBoleta(dataVenta);
+                        const nombreArchivo = `boleta_${idVenta}.xml`;
 
-                          VentaModel.marcarXmlGenerado(
-                            idVenta,
-                            (errorMarcarXml) => {
-                              if (errorMarcarXml) {
-                                db.run("ROLLBACK");
-                                return res.status(500).json({
-                                  mensaje: "Error al marcar XML generado",
-                                  error: errorMarcarXml.message
-                                });
-                              }
-
-                              db.run("COMMIT");
-
-                              return res.status(201).json({
-                                mensaje:
-                                  "Venta confirmada y XML generado correctamente",
-                                idVenta,
-                                idDocumentoXml,
-                                nombreArchivo,
-                                venta: dataVenta.venta,
-                                detalles: dataVenta.detalles,
-                                xml: contenidoXml
+                        DocumentoXmlModel.guardarXml(
+                          idVenta,
+                          nombreArchivo,
+                          contenidoXml,
+                          (errorXml, idDocumentoXml) => {
+                            if (errorXml) {
+                              db.run("ROLLBACK");
+                              return res.status(500).json({
+                                mensaje: "Error al guardar XML",
+                                error: errorXml.message
                               });
                             }
-                          );
-                        }
-                      );
-                    }
-                  );
+
+                            VentaModel.marcarXmlGenerado(
+                              idVenta,
+                              (errorMarcarXml) => {
+                                if (errorMarcarXml) {
+                                  db.run("ROLLBACK");
+                                  return res.status(500).json({
+                                    mensaje: "Error al marcar XML generado",
+                                    error: errorMarcarXml.message
+                                  });
+                                }
+
+                                db.run("COMMIT");
+
+                                return res.status(201).json({
+                                  mensaje:
+                                    "Venta confirmada y XML generado correctamente",
+                                  idVenta,
+                                  idDocumentoXml,
+                                  nombreArchivo,
+                                  venta: dataVenta.venta,
+                                  detalles: dataVenta.detalles,
+                                  xml: contenidoXml
+                                });
+                              }
+                            );
+                          }
+                        );
+                      }
+                    );
+                  });
                 }
               }
             );

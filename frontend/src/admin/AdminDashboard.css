@@ -1,0 +1,222 @@
+.admin-shell {
+  min-height: 100vh;
+  background: #f4f6f9;
+  display: flex;
+  color: #2f3542;
+}
+
+.admin-sidebar {
+  width: 260px;
+  background: #263238;
+  color: #fff;
+  padding: 1.25rem;
+  position: sticky;
+  top: 0;
+  min-height: 100vh;
+}
+
+.admin-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin-bottom: 2rem;
+}
+
+.admin-brand svg {
+  font-size: 1.8rem;
+  color: #ffc107;
+}
+
+.admin-sidebar nav {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.admin-sidebar button {
+  border: 0;
+  border-radius: 0.8rem;
+  background: transparent;
+  color: #cfd8dc;
+  padding: 0.8rem 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.admin-sidebar button:hover,
+.admin-sidebar button.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.admin-main {
+  flex: 1;
+  padding: 2rem;
+}
+
+.admin-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-topbar h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0.5rem 0 0.25rem;
+}
+
+.admin-topbar p {
+  margin: 0;
+  color: #6c757d;
+}
+
+.admin-user {
+  background: #fff;
+  border-radius: 1rem;
+  padding: 0.8rem 1rem;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+  display: grid;
+  text-align: right;
+}
+
+.admin-user span {
+  font-weight: 800;
+}
+
+.admin-user small {
+  color: #6c757d;
+}
+
+.admin-kpi-card {
+  border: 0;
+  border-radius: 1.2rem;
+  overflow: hidden;
+  color: #fff;
+  min-height: 135px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.admin-kpi-card .card-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-kpi-card p {
+  margin: 0 0 0.35rem;
+  opacity: 0.9;
+  font-weight: 700;
+}
+
+.admin-kpi-card h3 {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 900;
+}
+
+.admin-kpi-icon {
+  font-size: 2.6rem;
+  opacity: 0.45;
+}
+
+.admin-kpi-ventas { background: linear-gradient(135deg, #007bff, #00a6ff); }
+.admin-kpi-documentos { background: linear-gradient(135deg, #28a745, #62c370); }
+.admin-kpi-productos { background: linear-gradient(135deg, #fd7e14, #ffb347); }
+.admin-kpi-ticket { background: linear-gradient(135deg, #6f42c1, #9b72e7); }
+
+.admin-panel-card,
+.admin-defense-card {
+  border: 0;
+  border-radius: 1.2rem;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
+}
+
+.admin-panel-card h2,
+.admin-defense-card h2 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin-bottom: 0.25rem;
+}
+
+.admin-panel-card p,
+.admin-defense-card p {
+  color: #6c757d;
+}
+
+.admin-chart-row {
+  margin-bottom: 1rem;
+}
+
+.admin-chart-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.92rem;
+  margin-bottom: 0.35rem;
+}
+
+.admin-chart-label span {
+  font-weight: 700;
+}
+
+.admin-chart-label strong {
+  white-space: nowrap;
+}
+
+.admin-chart-track {
+  height: 12px;
+  border-radius: 999px;
+  background: #e9ecef;
+  overflow: hidden;
+}
+
+.admin-chart-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #17a2b8, #007bff);
+}
+
+.admin-chart-row small {
+  color: #6c757d;
+}
+
+.admin-loading {
+  min-height: 320px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.8rem;
+  color: #6c757d;
+}
+
+@media (max-width: 900px) {
+  .admin-shell {
+    display: block;
+  }
+
+  .admin-sidebar {
+    width: 100%;
+    min-height: auto;
+    position: static;
+  }
+
+  .admin-main {
+    padding: 1rem;
+  }
+
+  .admin-topbar {
+    display: block;
+  }
+
+  .admin-user {
+    margin-top: 1rem;
+    text-align: left;
+  }
+}

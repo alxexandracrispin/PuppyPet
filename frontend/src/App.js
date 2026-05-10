@@ -11,12 +11,14 @@ import Nosotros from "./pages/Nosotros";
 
 import Perfil from "./pages/MiPerfil";
 import MisCompras from "./pages/MisCompras";
+import AdminDashboard from "./admin/AdminDashboard";
 
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
 

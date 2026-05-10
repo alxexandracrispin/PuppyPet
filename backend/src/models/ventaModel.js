@@ -191,6 +191,124 @@ const VentaModel = {
     db.all(sql, [idUsuario], callback);
   },
 
+  registrarHechosVenta: (idVenta, callback) => {
+    const sqlDimCategoria = `
+      INSERT OR IGNORE INTO dim_categoria (id_categoria, nombre_categoria)
+      SELECT DISTINCT c.id_categoria, c.nombre_categoria
+      FROM detalle_venta dv
+      INNER JOIN producto p ON dv.id_producto = p.id_producto
+      INNER JOIN categoria c ON p.id_categoria = c.id_categoria
+      WHERE dv.id_venta = ?
+    `;
+
+    const sqlDimProducto = `
+      INSERT OR IGNORE INTO dim_producto (
+        id_producto,
+        codigo_interno,
+        nombre_producto,
+        precio_referencia,
+        estado
+      )
+      SELECT DISTINCT
+        p.id_producto,
+        p.codigo_interno,
+        p.nombre_producto,
+        p.precio,
+        p.estado
+      FROM detalle_venta dv
+      INNER JOIN producto p ON dv.id_producto = p.id_producto
+      WHERE dv.id_venta = ?
+    `;
+
+    const sqlDimTiempo = `
+      INSERT OR IGNORE INTO dim_tiempo (
+        fecha,
+        dia,
+        mes,
+        anio,
+        nombre_mes
+      )
+      SELECT DISTINCT
+        DATE(v.fecha_venta) AS fecha,
+        CAST(STRFTIME('%d', v.fecha_venta) AS INTEGER) AS dia,
+        CAST(STRFTIME('%m', v.fecha_venta) AS INTEGER) AS mes,
+        CAST(STRFTIME('%Y', v.fecha_venta) AS INTEGER) AS anio,
+        CASE STRFTIME('%m', v.fecha_venta)
+          WHEN '01' THEN 'Enero'
+          WHEN '02' THEN 'Febrero'
+          WHEN '03' THEN 'Marzo'
+          WHEN '04' THEN 'Abril'
+          WHEN '05' THEN 'Mayo'
+          WHEN '06' THEN 'Junio'
+          WHEN '07' THEN 'Julio'
+          WHEN '08' THEN 'Agosto'
+          WHEN '09' THEN 'Septiembre'
+          WHEN '10' THEN 'Octubre'
+          WHEN '11' THEN 'Noviembre'
+          WHEN '12' THEN 'Diciembre'
+        END AS nombre_mes
+      FROM venta v
+      WHERE v.id_venta = ?
+    `;
+
+    const sqlEliminarHechosPrevios = `
+      DELETE FROM hecho_venta
+      WHERE id_venta = ?
+    `;
+
+    const sqlHechos = `
+      INSERT INTO hecho_venta (
+        id_venta,
+        id_producto,
+        id_categoria,
+        id_tiempo,
+        id_cliente_tipo,
+        cantidad,
+        precio_unitario,
+        subtotal_linea,
+        iva_linea,
+        total_linea
+      )
+      SELECT
+        v.id_venta,
+        p.id_producto,
+        p.id_categoria,
+        t.id_tiempo,
+        CASE
+          WHEN v.id_usuario IS NOT NULL THEN 1
+          ELSE 2
+        END AS id_cliente_tipo,
+        dv.cantidad,
+        dv.precio_unitario,
+        dv.subtotal_linea,
+        ROUND(dv.subtotal_linea - (dv.subtotal_linea / 1.19), 0) AS iva_linea,
+        dv.subtotal_linea AS total_linea
+      FROM detalle_venta dv
+      INNER JOIN venta v ON dv.id_venta = v.id_venta
+      INNER JOIN producto p ON dv.id_producto = p.id_producto
+      INNER JOIN dim_tiempo t ON t.fecha = DATE(v.fecha_venta)
+      WHERE v.id_venta = ?
+    `;
+
+    db.run(sqlDimCategoria, [idVenta], (errorCategoria) => {
+      if (errorCategoria) return callback(errorCategoria);
+
+      db.run(sqlDimProducto, [idVenta], (errorProducto) => {
+        if (errorProducto) return callback(errorProducto);
+
+        db.run(sqlDimTiempo, [idVenta], (errorTiempo) => {
+          if (errorTiempo) return callback(errorTiempo);
+
+          db.run(sqlEliminarHechosPrevios, [idVenta], (errorEliminar) => {
+            if (errorEliminar) return callback(errorEliminar);
+
+            db.run(sqlHechos, [idVenta], callback);
+          });
+        });
+      });
+    });
+  },
+
   marcarXmlGenerado: (idVenta, callback) => {
     const sql = `
       UPDATE venta

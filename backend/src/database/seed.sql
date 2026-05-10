@@ -14,7 +14,7 @@ VALUES (
     'PuppyPet',
     '11111111-1',
     'admin@puppypet.cl',
-    '123456',
+    '$2b$10$EW6bD7/5AId5bbI1dHNhleZeUUZRff.VlKkC9XN4cELERz27QluMC',
     'Av. Principal 123',
     'Puente Alto',
     'Santiago',
@@ -141,3 +141,27 @@ VALUES
 ('JUG004', 'Puntero Láser', 'Diversión garantizada para gatos.', 2490, 35, '/assets/images/laser.png', 6),
 ('JUG005', 'Mordedor de Goma', 'Ayuda a la salud dental.', 4490, 28, '/assets/images/mordedor.png', 6),
 ('JUG006', 'Juguete con Plumas', 'Ideal para gatos activos.', 3490, 32, '/assets/images/pluma.png', 6);
+-- Datos base para modelo estrella BI / AdminLTE
+INSERT INTO dim_cliente_tipo (id_cliente_tipo, tipo_cliente)
+VALUES
+(1, 'Registrado'),
+(2, 'Invitado');
+
+INSERT INTO dim_categoria (id_categoria, nombre_categoria)
+SELECT id_categoria, nombre_categoria
+FROM categoria;
+
+INSERT INTO dim_producto (
+    id_producto,
+    codigo_interno,
+    nombre_producto,
+    precio_referencia,
+    estado
+)
+SELECT
+    id_producto,
+    codigo_interno,
+    nombre_producto,
+    precio,
+    estado
+FROM producto;

@@ -5,6 +5,7 @@ const cors = require("cors");
 const productoRoutes = require("./routes/productoRoutes");
 const categoriaRoutes = require("./routes/categoriaRoutes");
 const ventaRoutes = require("./routes/ventaRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 const app = express();
 const PORT = 3001;
@@ -23,6 +24,7 @@ app.use("/api/productos", productoRoutes);
 app.use("/api/categorias", categoriaRoutes);
 app.use("/api/ventas", ventaRoutes);
 app.use("/api/usuarios", usuarioRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.listen(PORT, () => {
   console.log(`Servidor backend corriendo en http://localhost:${PORT}`);
