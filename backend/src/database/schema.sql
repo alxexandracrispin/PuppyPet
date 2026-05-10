@@ -71,7 +71,7 @@ CREATE TABLE producto (
 
 CREATE TABLE venta (
     id_venta INTEGER PRIMARY KEY AUTOINCREMENT,
-    id_usuario INTEGER NOT NULL,
+    id_usuario INTEGER,
     id_cliente INTEGER,
     id_empresa INTEGER NOT NULL,
     tipo_documento TEXT NOT NULL,

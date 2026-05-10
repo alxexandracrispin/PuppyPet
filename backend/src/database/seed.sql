@@ -58,7 +58,7 @@ VALUES (
     'Sin giro',
     'cliente@puppypet.cl',
     '999999999',
-    'Sin dirección',
+    'Av. Principal 123',
     'Puente Alto',
     'Santiago'
 );
