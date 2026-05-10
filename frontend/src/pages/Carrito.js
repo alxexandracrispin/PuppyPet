@@ -56,10 +56,15 @@ function Carrito() {
         return;
       }
 
+      const usuarioGuardado = localStorage.getItem("usuario");
+      const usuario = usuarioGuardado ? JSON.parse(usuarioGuardado) : null;
+
       const payload = {
-        idUsuario: 1,
+        idUsuario: usuario ? usuario.idUsuario : null,
         idCliente: 1,
         idEmpresa: 1,
+        tipoCliente: usuario ? "REGISTRADO" : "INVITADO",
+        tipoEntrega: "RETIRO_TIENDA",
         items: items.map((item) => ({
           idProducto: item.id_producto,
           cantidad: item.cantidad,
@@ -77,19 +82,19 @@ function Carrito() {
           venta: response.data
         }
       });
-      
-   } catch (error) {
-  console.error("Error al confirmar venta:", error);
 
-  const mensajeBackend =
-    error.response?.data?.mensaje ||
-    error.response?.data?.error ||
-    "No se pudo confirmar la venta.";
+    } catch (error) {
+      console.error("Error al confirmar venta:", error);
 
-  setError(mensajeBackend);
-} finally {
-  setProcesando(false);
-}
+      const mensajeBackend =
+        error.response?.data?.mensaje ||
+        error.response?.data?.error ||
+        "No se pudo confirmar la venta.";
+
+      setError(mensajeBackend);
+    } finally {
+      setProcesando(false);
+    }
   };
 
   return (
@@ -99,6 +104,19 @@ function Carrito() {
       {error && (
         <Alert variant="danger">
           {error}
+        </Alert>
+      )}
+      {!localStorage.getItem("usuario") && items.length > 0 && (
+        <Alert variant="warning">
+          Estás comprando como invitado. La boleta se emitirá como consumidor final
+          con RUT 66.666.666-6 y la entrega quedará disponible solo para retiro en tienda.
+        </Alert>
+      )}
+
+      {localStorage.getItem("usuario") && items.length > 0 && (
+        <Alert variant="success">
+          La compra quedará asociada a tu usuario y podrás verla posteriormente en
+          tu historial de compras.
         </Alert>
       )}
 

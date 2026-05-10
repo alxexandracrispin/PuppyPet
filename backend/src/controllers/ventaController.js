@@ -23,7 +23,14 @@ function calcularTotalesDesdeItems(items) {
 
 const VentaController = {
   confirmarVentaDirecta: (req, res) => {
-    const { idUsuario, idCliente, idEmpresa, items } = req.body || {};
+    const {
+      idUsuario,
+      idCliente,
+      idEmpresa,
+      tipoCliente,
+      tipoEntrega,
+      items
+    } = req.body || {};
 
     if (!items || items.length === 0) {
       return res.status(400).json({
@@ -31,12 +38,20 @@ const VentaController = {
       });
     }
 
+    if (!idUsuario && tipoEntrega && tipoEntrega !== "RETIRO_TIENDA") {
+      return res.status(400).json({
+        mensaje: "Las compras como invitado solo permiten retiro en tienda"
+      });
+    }
+
     const totales = calcularTotalesDesdeItems(items);
 
     const venta = {
-      idUsuario: idUsuario || 1,
+      idUsuario: idUsuario || null,
       idCliente: idCliente || 1,
       idEmpresa: idEmpresa || 1,
+      tipoCliente: tipoCliente || (idUsuario ? "REGISTRADO" : "INVITADO"),
+      tipoEntrega: tipoEntrega || "RETIRO_TIENDA",
       tipoDocumento: "BOLETA",
       codigoDte: 39,
       folio: Date.now(),
@@ -189,6 +204,30 @@ const VentaController = {
       }
 
       return res.json(data);
+    });
+  },
+
+  obtenerVentasPorUsuario: (req, res) => {
+    const { idUsuario } = req.params;
+
+    if (!idUsuario) {
+      return res.status(400).json({
+        mensaje: "Debe indicar el ID del usuario"
+      });
+    }
+
+    VentaModel.obtenerVentasPorUsuario(idUsuario, (error, ventas) => {
+      if (error) {
+        return res.status(500).json({
+          mensaje: "Error al obtener compras del usuario",
+          error: error.message
+        });
+      }
+
+      return res.status(200).json({
+        mensaje: "Compras obtenidas correctamente",
+        ventas
+      });
     });
   },
 

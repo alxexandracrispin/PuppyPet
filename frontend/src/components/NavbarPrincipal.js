@@ -29,7 +29,7 @@ function NavbarPrincipal() {
       window.removeEventListener("usuarioActualizado", cargarUsuario);
       window.removeEventListener("storage", cargarUsuario);
     };
-}, [location.pathname]);
+  }, [location.pathname]);
 
   const totalItems = carrito.reduce((total, item) => {
     return total + item.cantidad;
@@ -98,6 +98,10 @@ function NavbarPrincipal() {
 
                 <Nav.Link as={Link} to="/perfil">
                   MI PERFIL
+                </Nav.Link>
+
+                <Nav.Link as={Link} to="/mis-compras">
+                  MIS COMPRAS
                 </Nav.Link>
 
                 <Nav.Link onClick={cerrarSesion}>

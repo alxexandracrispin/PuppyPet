@@ -69,12 +69,36 @@ const VentaModel = {
         v.*,
         u.nombre AS nombre_usuario,
         u.apellido AS apellido_usuario,
-        c.rut AS rut_cliente,
-        c.razon_social AS razon_social_cliente,
-        c.giro AS giro_cliente,
-        c.direccion AS direccion_cliente,
-        c.comuna AS comuna_cliente,
-        c.ciudad AS ciudad_cliente,
+
+        CASE
+          WHEN v.id_usuario IS NOT NULL THEN u.rut
+          ELSE c.rut
+        END AS rut_cliente,
+
+        CASE
+          WHEN v.id_usuario IS NOT NULL THEN u.nombre || ' ' || u.apellido
+          ELSE c.razon_social
+        END AS razon_social_cliente,
+
+        CASE
+          WHEN v.id_usuario IS NOT NULL THEN 'Particular'
+          ELSE c.giro
+        END AS giro_cliente,
+
+        CASE
+          WHEN v.id_usuario IS NOT NULL THEN u.direccion
+          ELSE c.direccion
+        END AS direccion_cliente,
+
+        CASE
+          WHEN v.id_usuario IS NOT NULL THEN u.comuna
+          ELSE c.comuna
+        END AS comuna_cliente,
+
+        CASE
+          WHEN v.id_usuario IS NOT NULL THEN u.ciudad
+          ELSE c.ciudad
+        END AS ciudad_cliente,
         e.rut_emisor,
         e.razon_social AS razon_social_emisor,
         e.giro_emisor,
@@ -82,7 +106,7 @@ const VentaModel = {
         e.comuna_origen,
         e.ciudad_origen
       FROM venta v
-      INNER JOIN usuario u ON v.id_usuario = u.id_usuario
+      LEFT JOIN usuario u ON v.id_usuario = u.id_usuario
       LEFT JOIN cliente c ON v.id_cliente = c.id_cliente
       INNER JOIN empresa_emisora e ON v.id_empresa = e.id_empresa
       WHERE v.id_venta = ?
@@ -125,6 +149,46 @@ const VentaModel = {
         });
       });
     });
+  },
+
+  obtenerVentasPorUsuario: (idUsuario, callback) => {
+    const sql = `
+    SELECT
+      v.id_venta,
+      v.id_usuario,
+      v.id_cliente,
+      v.id_empresa,
+      v.tipo_documento,
+      v.codigo_dte,
+      v.folio,
+      v.fecha_venta,
+      v.subtotal,
+      v.iva,
+      v.total,
+      v.estado_venta,
+      v.xml_generado,
+      COUNT(dv.id_detalle) AS cantidad_productos
+    FROM venta v
+    LEFT JOIN detalle_venta dv ON v.id_venta = dv.id_venta
+    WHERE v.id_usuario = ?
+    GROUP BY
+      v.id_venta,
+      v.id_usuario,
+      v.id_cliente,
+      v.id_empresa,
+      v.tipo_documento,
+      v.codigo_dte,
+      v.folio,
+      v.fecha_venta,
+      v.subtotal,
+      v.iva,
+      v.total,
+      v.estado_venta,
+      v.xml_generado
+    ORDER BY v.fecha_venta DESC
+  `;
+
+    db.all(sql, [idUsuario], callback);
   },
 
   marcarXmlGenerado: (idVenta, callback) => {
