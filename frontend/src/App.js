@@ -9,6 +9,8 @@ import Login from "./pages/Login";
 import Registro from "./pages/Registro";
 import Nosotros from "./pages/Nosotros";
 import Contacto from "./pages/Contacto";
+import Perfil from "./pages/MiPerfil";
+
 
 function App() {
   return (
@@ -29,6 +31,7 @@ function App() {
           <Route path="contacto" element={<Contacto />} />
 
           <Route path="producto/:idProducto" element={<ProductoDetalle />} />
+          <Route path="perfil" element={<Perfil />} />
 
           <Route path="*" element={<Navigate to="/" />} />
         </Route>

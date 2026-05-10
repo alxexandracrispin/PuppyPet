@@ -7,13 +7,17 @@ import {
   Form,
   Button,
   Alert,
-  Spinner
+  Spinner,
+  Modal
 } from "react-bootstrap";
 import { FaUserPlus } from "react-icons/fa";
 
 import api from "../api/api";
 
 function Registro() {
+  const [showModal, setShowModal] = useState(false);
+  const [modalMensaje, setModalMensaje] = useState("");
+
   const [formulario, setFormulario] = useState({
     nombre: "",
     apellido: "",
@@ -29,6 +33,11 @@ function Registro() {
   const [cargando, setCargando] = useState(false);
   const [mensajeExito, setMensajeExito] = useState("");
   const [mensajeError, setMensajeError] = useState("");
+
+  const mostrarPopup = (mensaje) => {
+    setModalMensaje(mensaje);
+    setShowModal(true);
+  };
 
   const manejarCambio = (event) => {
     const { name, value } = event.target;
@@ -53,14 +62,106 @@ function Registro() {
     });
   };
 
+  const limpiarRut = (rut) => {
+    return rut.replace(/\./g, "").replace(/-/g, "").toUpperCase();
+  };
+
+  const calcularDv = (rutNumerico) => {
+    let suma = 0;
+    let multiplicador = 2;
+
+    for (let i = rutNumerico.length - 1; i >= 0; i--) {
+      suma += parseInt(rutNumerico.charAt(i), 10) * multiplicador;
+      multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
+    }
+
+    const resto = suma % 11;
+    const dvCalculado = 11 - resto;
+
+    if (dvCalculado === 11) return "0";
+    if (dvCalculado === 10) return "K";
+
+    return dvCalculado.toString();
+  };
+
+  const validarRut = (rut) => {
+    if (!rut) return false;
+
+    const rutLimpio = limpiarRut(rut);
+
+    if (rutLimpio.length < 2) return false;
+
+    const cuerpo = rutLimpio.slice(0, -1);
+    const dv = rutLimpio.slice(-1);
+
+    if (!/^\d+$/.test(cuerpo)) return false;
+    if (!/^[0-9K]$/.test(dv)) return false;
+
+    const rutNumero = parseInt(cuerpo, 10);
+
+    if (rutNumero <= 1000000) return false;
+
+    const dvCorrecto = calcularDv(cuerpo);
+
+    return dv === dvCorrecto;
+  };
+
+  const validarPasswordSegura = (password) => {
+    const tieneMinimo8 = password.length >= 8;
+    const tieneMayuscula = /[A-Z]/.test(password);
+    const tieneMinuscula = /[a-z]/.test(password);
+    const tieneNumero = /[0-9]/.test(password);
+    const tieneSimbolo = /[^A-Za-z0-9]/.test(password);
+
+    return (
+      tieneMinimo8 &&
+      tieneMayuscula &&
+      tieneMinuscula &&
+      tieneNumero &&
+      tieneSimbolo
+    );
+  };
+
+  const requisitosPassword = {
+    minimo8: formulario.password.length >= 8,
+    mayuscula: /[A-Z]/.test(formulario.password),
+    minuscula: /[a-z]/.test(formulario.password),
+    numero: /[0-9]/.test(formulario.password),
+    simbolo: /[^A-Za-z0-9]/.test(formulario.password)
+  };
+
   const manejarRegistro = async (event) => {
     event.preventDefault();
 
     setMensajeExito("");
     setMensajeError("");
 
-    if (formulario.password !== formulario.confirmarPassword) {
-      setMensajeError("Las contraseñas no coinciden.");
+    if (
+      !formulario.nombre ||
+      !formulario.apellido ||
+      !formulario.rut ||
+      !formulario.correo ||
+      !formulario.direccion ||
+      !formulario.comuna ||
+      !formulario.ciudad ||
+      !formulario.password ||
+      !formulario.confirmarPassword
+    ) {
+      mostrarPopup("Todos los campos son obligatorios");
+      return;
+    }
+
+    if (!validarRut(formulario.rut)) {
+      mostrarPopup(
+        "El RUT ingresado no es válido. Debe ser mayor a 1.000.000 y respetar el dígito verificador."
+      );
+      return;
+    }
+
+    if (!validarPasswordSegura(formulario.password)) {
+      mostrarPopup(
+        "La contraseña debe tener mínimo 8 caracteres, incluir mayúscula, minúscula, número y símbolo."
+      );
       return;
     }
 
@@ -69,7 +170,7 @@ function Registro() {
 
       const response = await api.post("/usuarios/registro", formulario);
 
-      setMensajeExito(
+      mostrarPopup(
         response.data.mensaje || "Usuario registrado correctamente."
       );
 
@@ -82,7 +183,7 @@ function Registro() {
         error.response?.data?.error ||
         "No se pudo registrar el usuario.";
 
-      setMensajeError(mensajeBackend);
+      mostrarPopup(mensajeBackend);
     } finally {
       setCargando(false);
     }
@@ -198,6 +299,30 @@ function Registro() {
                       onChange={manejarCambio}
                       placeholder="Ingrese una contraseña"
                     />
+
+                    {formulario.password && (
+                      <div className="mt-2 small">
+                        <div className={requisitosPassword.minimo8 ? "text-success" : "text-danger"}>
+                          {requisitosPassword.minimo8 ? "✓" : "✗"} Mínimo 8 caracteres
+                        </div>
+
+                        <div className={requisitosPassword.mayuscula ? "text-success" : "text-danger"}>
+                          {requisitosPassword.mayuscula ? "✓" : "✗"} Al menos una letra mayúscula
+                        </div>
+
+                        <div className={requisitosPassword.minuscula ? "text-success" : "text-danger"}>
+                          {requisitosPassword.minuscula ? "✓" : "✗"} Al menos una letra minúscula
+                        </div>
+
+                        <div className={requisitosPassword.numero ? "text-success" : "text-danger"}>
+                          {requisitosPassword.numero ? "✓" : "✗"} Al menos un número
+                        </div>
+
+                        <div className={requisitosPassword.simbolo ? "text-success" : "text-danger"}>
+                          {requisitosPassword.simbolo ? "✓" : "✗"} Al menos un símbolo
+                        </div>
+                      </div>
+                    )}
                   </Form.Group>
 
                   <Form.Group className="mb-4">
@@ -235,6 +360,20 @@ function Registro() {
           </Col>
         </Row>
       </div>
+
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Validación de registro</Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>{modalMensaje}</Modal.Body>
+
+        <Modal.Footer>
+          <Button variant="primary" onClick={() => setShowModal(false)}>
+            Aceptar
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 }
