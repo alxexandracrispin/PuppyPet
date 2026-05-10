@@ -13,12 +13,15 @@ import Perfil from "./pages/MiPerfil";
 import MisCompras from "./pages/MisCompras";
 import AdminDashboard from "./admin/AdminDashboard";
 
+import AdminInventario from "./admin/inventario/AdminInventario";
+
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/inventario" element={<AdminInventario />} />
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
 
@@ -36,6 +39,8 @@ function App() {
           
 
           <Route path="producto/:idProducto" element={<ProductoDetalle />} />
+
+          
           
 
           <Route path="*" element={<Navigate to="/" />} />

@@ -170,7 +170,10 @@ function AdminDashboard() {
           <button className="active" type="button">
             <FaChartBar /> Dashboard BI
           </button>
-          <button type="button" onClick={() => navigate("/")}> 
+          <button type="button" onClick={() => navigate("/admin/inventario")}>
+            <FaShoppingBasket /> Inventario
+          </button>
+          <button type="button" onClick={() => navigate("/")}>
             <FaHome /> Volver a tienda
           </button>
           <button type="button" onClick={cerrarSesion}>
@@ -329,7 +332,7 @@ function AdminDashboard() {
                     Este dashboard consume una tabla de hechos de ventas y dimensiones de producto,
                     categoría, tiempo y tipo de cliente. Su objetivo es aplicar inteligencia de negocio
                     simple para apoyar decisiones de stock, ventas y comportamiento de clientes sin convertir
-                    el proyecto en una solución BI empresarial compleja. 
+                    el proyecto en una solución BI empresarial compleja.
                     <p><b>Dev. Alexandra Crispin - Alejandro Gonzalez</b></p>
                   </p>
                 </Card.Body>
