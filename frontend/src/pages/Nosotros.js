@@ -1,6 +1,6 @@
 import { Container, Row, Col, Card } from "react-bootstrap";
-import { FaPaw, FaStore, FaHeart, FaUsers } from "react-icons/fa";
-import { GiClover, GiDragonBalls } from "react-icons/gi"
+import { FaPaw } from "react-icons/fa";
+import { GiClover} from "react-icons/gi"
 
 function Nosotros() {
   const tarjetas = [
@@ -14,7 +14,7 @@ function Nosotros() {
       titulo: "Alejandro González Queupumil",
       texto: "Backend Developer / QA Lead",
       imagen: "/assets/images/alejandro.jpeg",
-      icono: <GiDragonBalls />
+      icono: <span className="kanji-icon">亀</span>
     },
 
   ];

@@ -126,9 +126,7 @@ function NavbarPrincipal() {
               NOSOTROS
             </Nav.Link>
 
-            <Nav.Link as={Link} to="/contacto">
-              CONTACTO
-            </Nav.Link>
+           
 
             <Nav.Link as={Link} to="/carrito" className="cart-link">
               <FaShoppingCart className="nav-icon" />
