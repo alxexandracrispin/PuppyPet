@@ -7,10 +7,10 @@ import {
   Card,
   Button,
   Badge,
-  Carousel,
   Alert,
   Spinner,
-  ListGroup
+  ListGroup,
+  Form
 } from "react-bootstrap";
 import { FaCartPlus, FaArrowLeft, FaStar } from "react-icons/fa";
 
@@ -22,6 +22,7 @@ function ProductoDetalle() {
   const [producto, setProducto] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
+  const [cantidad, setCantidad] = useState(1);
 
   useEffect(() => {
     cargarProducto();
@@ -41,68 +42,20 @@ function ProductoDetalle() {
     }
   };
 
-  const obtenerImagenesCarrusel = () => {
-    if (!producto) return [];
+  const manejarCambioCantidad = (event) => {
+    const nuevaCantidad = Number(event.target.value);
 
-    const imagenPrincipal = producto.imagen_url;
+    if (nuevaCantidad < 1) {
+      setCantidad(1);
+      return;
+    }
 
-    const imagenesPorCategoria = {
-      Perros: [
-        imagenPrincipal,
-        "/assets/images/pedi3.png",
-        "/assets/images/royal3.png",
-        "/assets/images/dogchow3.png"
-      ],
-      Gatos: [
-        imagenPrincipal,
-        "/assets/images/wisk3.png",
-        "/assets/images/royalgato3.png",
-        "/assets/images/catsh3.png"
-      ],
-      Snack: [
-        imagenPrincipal,
-        "/assets/images/snackhuesito.jpg",
-        "/assets/images/snackdental.webp",
-        "/assets/images/snackcarne.webp"
-      ],
-      Accesorios: [
-        imagenPrincipal,
-        "/assets/images/camaperro.webp",
-        "/assets/images/transportador.jpg",
-        "/assets/images/bebedero.webp"
-      ],
-      Higiene: [
-        imagenPrincipal,
-        "/assets/images/shampoperro.png",
-        "/assets/images/toallahumeda.png",
-        "/assets/images/cepillo.png"
-      ],
-      Juguetes: [
-        imagenPrincipal,
-        "/assets/images/pelota.png",
-        "/assets/images/cuerda.png",
-        "/assets/images/raton.png"
-      ]
-    };
+    if (producto?.stock && nuevaCantidad > producto.stock) {
+      setCantidad(producto.stock);
+      return;
+    }
 
-    const imagenes = imagenesPorCategoria[producto.nombre_categoria] || [
-      imagenPrincipal
-    ];
-
-    return [...new Set(imagenes.filter(Boolean))];
-  };
-
-  const obtenerCaracteristicas = () => {
-    if (!producto) return [];
-
-    return [
-      `Categoría: ${producto.nombre_categoria}`,
-      `Código interno: ${producto.codigo_interno}`,
-      `Stock disponible: ${producto.stock} unidades`,
-      "Producto disponible para venta online",
-      "Producto sin impuesto adicional",
-      "Apto para emisión de boleta XML simulada"
-    ];
+    setCantidad(nuevaCantidad);
   };
 
   const agregarAlCarrito = () => {
@@ -119,8 +72,9 @@ function ProductoDetalle() {
         item.id_producto === producto.id_producto
           ? {
               ...item,
-              cantidad: item.cantidad + 1,
-              subtotal_linea: (item.cantidad + 1) * item.precio
+              cantidad: item.cantidad + cantidad,
+              subtotal_linea: (item.cantidad + cantidad) * item.precio,
+              stock: producto.stock
             }
           : item
       );
@@ -131,8 +85,9 @@ function ProductoDetalle() {
           id_producto: producto.id_producto,
           nombre_producto: producto.nombre_producto,
           precio: producto.precio,
-          cantidad: 1,
-          subtotal_linea: producto.precio
+          cantidad: cantidad,
+          subtotal_linea: producto.precio * cantidad,
+          stock: producto.stock
         }
       ];
     }
@@ -168,8 +123,14 @@ function ProductoDetalle() {
     );
   }
 
-  const imagenes = obtenerImagenesCarrusel();
-  const caracteristicas = obtenerCaracteristicas();
+  const caracteristicas = [
+    `Categoría: ${producto.nombre_categoria}`,
+    `Código interno: ${producto.codigo_interno}`,
+    `Stock disponible: ${producto.stock} unidades`,
+    "Producto disponible para venta online",
+    "Producto sin impuesto adicional",
+    "Apto para emisión de boleta XML simulada"
+  ];
 
   return (
     <Container className="py-5">
@@ -187,17 +148,11 @@ function ProductoDetalle() {
         <Row className="g-4">
           <Col lg={6}>
             <Card className="producto-detalle-card">
-              <Carousel fade interval={3500}>
-                {imagenes.map((imagen, index) => (
-                  <Carousel.Item key={index}>
-                    <img
-                      src={imagen}
-                      alt={`${producto.nombre_producto} ${index + 1}`}
-                      className="d-block w-100 producto-detalle-img"
-                    />
-                  </Carousel.Item>
-                ))}
-              </Carousel>
+              <img
+                src={producto.imagen_url}
+                alt={producto.nombre_producto}
+                className="d-block w-100 producto-detalle-img"
+              />
             </Card>
           </Col>
 
@@ -224,12 +179,27 @@ function ProductoDetalle() {
                   Stock disponible: {producto.stock}
                 </p>
 
+                <Form.Group className="mb-4">
+                  <Form.Label className="text-white">Cantidad</Form.Label>
+                  <Form.Control
+                    type="number"
+                    min="1"
+                    max={producto.stock}
+                    value={cantidad}
+                    onChange={manejarCambioCantidad}
+                    style={{ width: "120px" }}
+                  />
+                  <Form.Text className="text-light">
+                    Máximo disponible: {producto.stock}
+                  </Form.Text>
+                </Form.Group>
+
                 <Button
                   variant="warning"
                   size="lg"
                   className="fw-bold mb-4"
-                  disabled={producto.stock <= 0}
                   onClick={agregarAlCarrito}
+                  disabled={producto.stock <= 0}
                 >
                   <FaCartPlus className="me-2" />
                   Agregar al carrito
@@ -239,7 +209,9 @@ function ProductoDetalle() {
 
                 <ListGroup variant="flush" className="detalle-list mb-4">
                   {caracteristicas.map((item, index) => (
-                    <ListGroup.Item key={index}>{item}</ListGroup.Item>
+                    <ListGroup.Item key={index}>
+                      {item}
+                    </ListGroup.Item>
                   ))}
                 </ListGroup>
 
@@ -253,9 +225,11 @@ function ProductoDetalle() {
                     <FaStar />
                     <FaStar />
                   </div>
+
                   <p className="mb-1">
                     Producto bien valorado por clientes de PuppyPet.
                   </p>
+
                   <small>
                     Comentario referencial para presentación académica.
                   </small>
