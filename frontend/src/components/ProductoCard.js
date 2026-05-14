@@ -1,10 +1,17 @@
 import { Card, Button, Badge } from "react-bootstrap";
 import { FaCartPlus } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function ProductoCard({ producto, onAgregar }) {
+
+  const navigate = useNavigate();
+
   return (
-    <Card className="h-100 shadow-sm producto-card producto-card-dark">
+    <Card
+      className="h-100 shadow-sm producto-card producto-card-dark"
+      style={{ cursor: "pointer" }}
+      onClick={() => navigate(`/producto/${producto.id_producto}`)}
+    >
       <Card.Img
         variant="top"
         src={producto.imagen_url || "/assets/images/default-producto.png"}
@@ -20,12 +27,7 @@ function ProductoCard({ producto, onAgregar }) {
         </div>
 
         <Card.Title className="producto-title">
-          <Link
-            to={`/producto/${producto.id_producto}`}
-            className="producto-title-link"
-          >
-            {producto.nombre_producto}
-          </Link>
+          {producto.nombre_producto}
         </Card.Title>
 
         <Card.Text className="producto-description">
@@ -44,7 +46,10 @@ function ProductoCard({ producto, onAgregar }) {
           variant="warning"
           className="w-100 fw-bold"
           disabled={producto.stock <= 0}
-          onClick={() => onAgregar(producto)}
+          onClick={(event) => {
+            event.stopPropagation();
+            onAgregar(producto);
+          }}
         >
           <FaCartPlus className="me-2" />
           {producto.stock > 0 ? "Agregar al carrito" : "Sin stock"}

@@ -2,3 +2,6 @@ node_modules
 
 backend/src/database/puppypet.db
 backend/src/database/*.db
+
+backend/src/database/puppypet.db
+backend/src/database/*.db

@@ -32,14 +32,58 @@ function Carrito() {
     return calcularTotal() - calcularSubtotal();
   };
 
-  const eliminarItem = (idProducto) => {
-    const nuevoCarrito = items.filter(
-      (item) => item.id_producto !== idProducto
-    );
+const aumentarCantidad = (idProducto) => {
+  const nuevoCarrito = items.map((item) => {
+    if (item.id_producto === idProducto) {
+      const nuevaCantidad = item.cantidad + 1;
 
-    localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
-    setItems(nuevoCarrito);
-  };
+      return {
+        ...item,
+        cantidad: nuevaCantidad,
+        subtotal_linea: nuevaCantidad * item.precio
+      };
+    }
+
+    return item;
+  });
+
+  localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
+  setItems(nuevoCarrito);
+
+  window.dispatchEvent(new Event("carritoActualizado"));
+};
+
+const disminuirCantidad = (idProducto) => {
+  const nuevoCarrito = items.map((item) => {
+    if (item.id_producto === idProducto) {
+      const nuevaCantidad = item.cantidad - 1;
+
+      return {
+        ...item,
+        cantidad: nuevaCantidad,
+        subtotal_linea: nuevaCantidad * item.precio
+      };
+    }
+
+    return item;
+  });
+
+  localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
+  setItems(nuevoCarrito);
+
+  window.dispatchEvent(new Event("carritoActualizado"));
+};
+
+const eliminarItem = (idProducto) => {
+  const nuevoCarrito = items.filter(
+    (item) => item.id_producto !== idProducto
+  );
+
+  localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
+  setItems(nuevoCarrito);
+
+  window.dispatchEvent(new Event("carritoActualizado"));
+};
 
   const vaciarCarrito = () => {
     localStorage.removeItem("carrito");
@@ -141,7 +185,30 @@ function Carrito() {
               {items.map((item) => (
                 <tr key={item.id_producto}>
                   <td>{item.nombre_producto}</td>
-                  <td className="text-center">{item.cantidad}</td>
+                  <td className="text-center">
+  <div className="d-flex justify-content-center align-items-center gap-2">
+
+    <Button
+      variant="outline-secondary"
+      size="sm"
+      onClick={() => disminuirCantidad(item.id_producto)}
+      disabled={item.cantidad <= 1}
+    >
+      -
+    </Button>
+
+    <span className="fw-bold">{item.cantidad}</span>
+
+    <Button
+      variant="outline-secondary"
+      size="sm"
+      onClick={() => aumentarCantidad(item.id_producto)}
+    >
+      +
+    </Button>
+
+  </div>
+</td>
                   <td className="text-end">
                     ${item.precio.toLocaleString("es-CL")}
                   </td>
