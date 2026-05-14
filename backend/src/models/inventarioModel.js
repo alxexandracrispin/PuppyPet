@@ -10,8 +10,15 @@ const InventarioModel = {
         p.descripcion,
         p.precio,
         p.stock,
-        p.estado,
-        c.nombre_categoria
+        p.stock_critico,
+        p.stock_alerta,
+      CASE
+        WHEN p.stock <= p.stock_critico THEN 'ROJO'
+        WHEN p.stock <= p.stock_alerta THEN 'AMARILLO'
+        ELSE 'VERDE'
+      END AS estado_stock,
+      p.estado,
+      c.nombre_categoria
       FROM producto p
       INNER JOIN categoria c ON p.id_categoria = c.id_categoria
       WHERE p.estado = 'ACTIVO'
@@ -161,6 +168,30 @@ const InventarioModel = {
         });
       });
     });
+  },
+  actualizarUmbralesStock: (datos, callback) => {
+    const {
+      idProducto,
+      stockCritico,
+      stockAlerta
+    } = datos;
+
+    const sql = `
+    UPDATE producto
+    SET
+      stock_critico = ?,
+      stock_alerta = ?
+    WHERE id_producto = ?
+      AND estado = 'ACTIVO'
+  `;
+
+    db.run(
+      sql,
+      [stockCritico, stockAlerta, idProducto],
+      function (error) {
+        callback(error, this?.changes);
+      }
+    );
   }
 };
 
