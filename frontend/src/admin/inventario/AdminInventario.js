@@ -44,6 +44,10 @@ function AdminInventario() {
     const [motivo, setMotivo] = useState("");
     const [observacion, setObservacion] = useState("");
 
+    const [mostrarModalUmbrales, setMostrarModalUmbrales] = useState(false);
+    const [stockCritico, setStockCritico] = useState("");
+    const [stockAlerta, setStockAlerta] = useState("");
+
     useEffect(() => {
         const usuarioGuardado = localStorage.getItem("usuario");
 
@@ -146,6 +150,84 @@ function AdminInventario() {
         }
     };
 
+    const abrirModalUmbrales = (producto) => {
+        setProductoSeleccionado(producto);
+        setStockCritico(producto.stock_critico ?? 5);
+        setStockAlerta(producto.stock_alerta ?? 10);
+        setErrorModal("");
+        setMensaje("");
+        setError("");
+        setMostrarModalUmbrales(true);
+    };
+
+    const cerrarModalUmbrales = () => {
+        setMostrarModalUmbrales(false);
+        setProductoSeleccionado(null);
+        setErrorModal("");
+    };
+
+    const guardarUmbralesStock = async (evento) => {
+        evento.preventDefault();
+
+        if (Number(stockCritico) < 0 || Number(stockAlerta) < 0) {
+            setErrorModal("Los umbrales no pueden ser negativos.");
+            return;
+        }
+
+        if (Number(stockCritico) >= Number(stockAlerta)) {
+            setErrorModal("El stock crítico debe ser menor que el stock de alerta.");
+            return;
+        }
+
+        try {
+            setError("");
+            setErrorModal("");
+            setMensaje("");
+
+            await api.put(
+                `/admin/inventario/productos/${productoSeleccionado.id_producto}/umbrales`,
+                {
+                    stockCritico: Number(stockCritico),
+                    stockAlerta: Number(stockAlerta)
+                }
+            );
+
+            setMensaje("Semáforo de stock actualizado correctamente.");
+            cerrarModalUmbrales();
+            cargarDatos();
+        } catch (errorUmbrales) {
+            console.error("Error al actualizar umbrales:", errorUmbrales);
+            setErrorModal(
+                errorUmbrales.response?.data?.mensaje ||
+                "No se pudo actualizar el semáforo de stock."
+            );
+        }
+    };
+
+    const obtenerBadgeStock = (producto) => {
+        if (producto.estado_stock === "ROJO") {
+            return "danger";
+        }
+
+        if (producto.estado_stock === "AMARILLO") {
+            return "warning";
+        }
+
+        return "success";
+    };
+
+    const obtenerTextoStock = (producto) => {
+        if (producto.estado_stock === "ROJO") {
+            return "Stock crítico";
+        }
+
+        if (producto.estado_stock === "AMARILLO") {
+            return "Cercano al crítico";
+        }
+
+        return "Stock ideal";
+    };
+
     const cerrarSesion = () => {
         localStorage.removeItem("usuario");
         window.dispatchEvent(new Event("usuarioActualizado"));
@@ -229,13 +311,15 @@ function AdminInventario() {
                                                             <th>Categoría</th>
                                                             <th>Precio</th>
                                                             <th>Stock</th>
+                                                            <th>Semáforo</th>
+                                                            <th>Umbrales</th>
                                                             <th>Acciones</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         {productos.length === 0 ? (
                                                             <tr>
-                                                                <td colSpan="6" className="text-center">
+                                                                <td colSpan="8" className="text-center">
                                                                     No hay productos disponibles.
                                                                 </td>
                                                             </tr>
@@ -253,23 +337,34 @@ function AdminInventario() {
                                                                     </td>
                                                                     <td>
                                                                         <Badge
-                                                                            bg={
-                                                                                Number(producto.stock) <= 5
-                                                                                    ? "danger"
-                                                                                    : "success"
-                                                                            }
+                                                                            bg={obtenerBadgeStock(producto)}
+                                                                            text={producto.estado_stock === "AMARILLO" ? "dark" : undefined}
                                                                         >
                                                                             {producto.stock}
                                                                         </Badge>
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <Badge
+                                                                            bg={obtenerBadgeStock(producto)}
+                                                                            text={producto.estado_stock === "AMARILLO" ? "dark" : undefined}
+                                                                        >
+                                                                            {obtenerTextoStock(producto)}
+                                                                        </Badge>
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <small>
+                                                                            Crítico: {producto.stock_critico ?? 5} / Alerta:{" "}
+                                                                            {producto.stock_alerta ?? 10}
+                                                                        </small>
                                                                     </td>
                                                                     <td>
                                                                         <Button
                                                                             size="sm"
                                                                             variant="success"
                                                                             className="me-2"
-                                                                            onClick={() =>
-                                                                                abrirModal(producto, "ENTRADA")
-                                                                            }
+                                                                            onClick={() => abrirModal(producto, "ENTRADA")}
                                                                         >
                                                                             <FaArrowUp /> Sumar
                                                                         </Button>
@@ -277,11 +372,18 @@ function AdminInventario() {
                                                                         <Button
                                                                             size="sm"
                                                                             variant="danger"
-                                                                            onClick={() =>
-                                                                                abrirModal(producto, "SALIDA")
-                                                                            }
+                                                                            className="me-2"
+                                                                            onClick={() => abrirModal(producto, "SALIDA")}
                                                                         >
                                                                             <FaArrowDown /> Restar
+                                                                        </Button>
+
+                                                                        <Button
+                                                                            size="sm"
+                                                                            variant="outline-warning"
+                                                                            onClick={() => abrirModalUmbrales(producto)}
+                                                                        >
+                                                                            Semáforo
                                                                         </Button>
                                                                     </td>
                                                                 </tr>
@@ -453,7 +555,75 @@ function AdminInventario() {
                     </Modal.Footer>
                 </Form>
             </Modal>
+            <Modal show={mostrarModalUmbrales} onHide={cerrarModalUmbrales} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Editar semáforo de stock</Modal.Title>
+                </Modal.Header>
+
+                <Form onSubmit={guardarUmbralesStock}>
+                    <Modal.Body>
+                        {productoSeleccionado && (
+                            <>
+                                <p>
+                                    <strong>Producto:</strong>{" "}
+                                    {productoSeleccionado.nombre_producto}
+                                </p>
+
+                                <p>
+                                    <strong>Stock actual:</strong> {productoSeleccionado.stock}
+                                </p>
+
+                                {errorModal && (
+                                    <Alert variant="danger">{errorModal}</Alert>
+                                )}
+
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Stock crítico desde</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        min="0"
+                                        value={stockCritico}
+                                        onChange={(evento) => setStockCritico(evento.target.value)}
+                                    />
+                                    <Form.Text>
+                                        Si el stock es menor o igual a este valor, el semáforo será rojo.
+                                    </Form.Text>
+                                </Form.Group>
+
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Stock de alerta hasta</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        min="1"
+                                        value={stockAlerta}
+                                        onChange={(evento) => setStockAlerta(evento.target.value)}
+                                    />
+                                    <Form.Text>
+                                        Si el stock está entre crítico + 1 y alerta, el semáforo será amarillo.
+                                    </Form.Text>
+                                </Form.Group>
+
+                                <Alert variant="info">
+                                    Con esta configuración: rojo hasta {stockCritico || 0}, amarillo
+                                    hasta {stockAlerta || 0}, verde sobre {stockAlerta || 0}.
+                                </Alert>
+                            </>
+                        )}
+                    </Modal.Body>
+
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={cerrarModalUmbrales}>
+                            Cancelar
+                        </Button>
+
+                        <Button variant="warning" type="submit">
+                            Guardar semáforo
+                        </Button>
+                    </Modal.Footer>
+                </Form>
+            </Modal>
         </div>
+
     );
 }
 

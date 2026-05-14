@@ -70,6 +70,8 @@ CREATE TABLE producto (
     descripcion TEXT,
     precio INTEGER NOT NULL,
     stock INTEGER NOT NULL,
+    stock_critico INTEGER DEFAULT 5,
+    stock_alerta INTEGER DEFAULT 10,
     imagen_url TEXT,
     estado TEXT DEFAULT 'ACTIVO',
     id_categoria INTEGER NOT NULL,
