@@ -48,6 +48,8 @@ function AdminInventario() {
     const [stockCritico, setStockCritico] = useState("");
     const [stockAlerta, setStockAlerta] = useState("");
 
+    const [filtroStock, setFiltroStock] = useState("TODOS");
+
     useEffect(() => {
         const usuarioGuardado = localStorage.getItem("usuario");
 
@@ -234,6 +236,18 @@ function AdminInventario() {
         navigate("/login");
     };
 
+    const productosCriticos = productos.filter(
+        (producto) => producto.estado_stock === "ROJO"
+    );
+
+    const productosFiltrados = productos.filter((producto) => {
+        if (filtroStock === "TODOS") {
+            return true;
+        }
+
+        return producto.estado_stock === filtroStock;
+    });
+
     if (!usuario) return null;
 
     return (
@@ -301,6 +315,28 @@ function AdminInventario() {
                                                 Permite sumar o restar stock dejando historial del
                                                 movimiento.
                                             </p>
+                                            {productosCriticos.length > 0 && (
+                                                <Alert variant="danger">
+                                                    <strong>Atención:</strong> existen {productosCriticos.length} productos con stock crítico.
+                                                    Usa el filtro de estado para revisarlos rápidamente.
+                                                </Alert>
+                                            )}
+                                            <Row className="mb-3">
+                                                <Col md={4}>
+                                                    <Form.Group>
+                                                        <Form.Label>Filtrar por estado de stock</Form.Label>
+                                                        <Form.Select
+                                                            value={filtroStock}
+                                                            onChange={(evento) => setFiltroStock(evento.target.value)}
+                                                        >
+                                                            <option value="TODOS">Todos los productos</option>
+                                                            <option value="VERDE">Stock ideal</option>
+                                                            <option value="AMARILLO">Cercano al crítico</option>
+                                                            <option value="ROJO">Stock crítico</option>
+                                                        </Form.Select>
+                                                    </Form.Group>
+                                                </Col>
+                                            </Row>
 
                                             <div className="table-responsive">
                                                 <Table hover className="align-middle">
@@ -317,14 +353,14 @@ function AdminInventario() {
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        {productos.length === 0 ? (
+                                                        {productosFiltrados.length === 0 ? (
                                                             <tr>
                                                                 <td colSpan="8" className="text-center">
                                                                     No hay productos disponibles.
                                                                 </td>
                                                             </tr>
                                                         ) : (
-                                                            productos.map((producto) => (
+                                                            productosFiltrados.map((producto) => (
                                                                 <tr key={producto.id_producto}>
                                                                     <td>{producto.codigo_interno}</td>
                                                                     <td>{producto.nombre_producto}</td>

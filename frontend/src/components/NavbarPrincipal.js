@@ -90,19 +90,24 @@ function NavbarPrincipal() {
               </NavDropdown.Item>
             </NavDropdown>
 
+            <Nav.Link as={Link} to="/nosotros">
+              NOSOTROS
+            </Nav.Link>
+
+
+
             {usuario ? (
               <>
-                <Nav.Link as={Link} to="/perfil">
-                  Hola, {usuario.nombre}
-                </Nav.Link>
-
-                <Nav.Link as={Link} to="/perfil">
-                  MI PERFIL
+                <Nav.Link as={Link} to="/perfil" className="perfil-nav-badge text-center">
+                  <div>MI PERFIL</div>
+                  <small>Hola, {usuario.nombre}</small>
                 </Nav.Link>
 
                 <Nav.Link as={Link} to="/mis-compras">
                   MIS COMPRAS
                 </Nav.Link>
+
+
 
                 {usuario.rol === "ADMIN" && (
                   <Nav.Link as={Link} to="/admin">
@@ -126,14 +131,14 @@ function NavbarPrincipal() {
                   <FaSignInAlt className="nav-icon" />
                   INICIAR SESIÓN
                 </Nav.Link>
+
               </>
             )}
 
-            <Nav.Link as={Link} to="/nosotros">
-              NOSOTROS
-            </Nav.Link>
 
-           
+
+
+
 
             <Nav.Link as={Link} to="/carrito" className="cart-link">
               <FaShoppingCart className="nav-icon" />
