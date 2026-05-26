@@ -74,6 +74,8 @@ function AdminDashboard() {
   const [categorias, setCategorias] = useState([]);
   const [tiposCliente, setTiposCliente] = useState([]);
 
+  const [productosCriticos, setProductosCriticos] = useState([]);
+
   useEffect(() => {
     const usuarioGuardado = localStorage.getItem("usuario");
 
@@ -91,6 +93,20 @@ function AdminDashboard() {
 
     setUsuario(usuarioParseado);
   }, [navigate]);
+
+  const cargarProductosCriticos = async () => {
+    try {
+      const response = await api.get("/admin/inventario/productos");
+
+      const criticos = response.data.filter(
+        (producto) => producto.estado_stock === "ROJO"
+      );
+
+      setProductosCriticos(criticos);
+    } catch (errorStock) {
+      console.error("Error al cargar alerta de stock crítico:", errorStock);
+    }
+  };
 
   useEffect(() => {
     if (!usuario) return;
@@ -128,6 +144,7 @@ function AdminDashboard() {
     };
 
     cargarDashboard();
+    cargarProductosCriticos();
   }, [usuario]);
 
   const maxProductos = useMemo(
@@ -197,6 +214,26 @@ function AdminDashboard() {
 
         <Container fluid className="px-0">
           {error && <Alert variant="danger">{error}</Alert>}
+
+          {productosCriticos.length > 0 && (
+            <Alert
+              variant="danger"
+              className="d-flex justify-content-between align-items-center flex-wrap gap-2"
+            >
+              <div>
+                <strong>Alerta de stock crítico:</strong>{" "}
+                existen {productosCriticos.length} productos que requieren revisión.
+              </div>
+
+              <Button
+                variant="light"
+                size="sm"
+                onClick={() => navigate("/admin/inventario")}
+              >
+                Ir a inventario
+              </Button>
+            </Alert>
+          )}
 
           {cargando ? (
             <div className="admin-loading">
