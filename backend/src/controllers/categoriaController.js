@@ -1,3 +1,4 @@
+// Se importa el modelo de categoría para ejecutar las consultas a la base de datos
 const CategoriaModel = require("../models/categoriaModel");
 
 const CategoriaController = {
