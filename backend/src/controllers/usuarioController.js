@@ -1,10 +1,15 @@
+// Se importa el modelo de usuario y bcryptjs,
+// librería que permite encriptar contraseñas convirtiéndolas en un hash irreversible
 const UsuarioModel = require("../models/usuarioModel");
 const bcrypt = require("bcryptjs");
 
+// Elimina puntos y guiones del RUT para normalizarlo antes de validarlo
 const limpiarRut = (rut) => {
   return rut.replace(/\./g, "").replace(/-/g, "").toUpperCase();
 };
 
+// Aplica el algoritmo módulo 11 para calcular el dígito verificador del RUT.
+// Itera los dígitos de derecha a izquierda multiplicando por 2-7 en ciclo
 const calcularDv = (rutNumerico) => {
   let suma = 0;
   let multiplicador = 2;
@@ -23,6 +28,8 @@ const calcularDv = (rutNumerico) => {
   return dvCalculado.toString();
 };
 
+// Valida que el RUT tenga formato correcto y que su dígito verificador sea el calculado.
+// Rechaza RUTs menores a 1.000.000 para descartar valores de prueba o ficticios
 const validarRut = (rut) => {
   if (!rut) return false;
 
@@ -45,14 +52,16 @@ const validarRut = (rut) => {
   return dv === dvCorrecto;
 };
 
+// Valida que la contraseña cumpla la política de seguridad:
+// mínimo 8 caracteres, mayúscula, minúscula, número y símbolo
 const validarPasswordSegura = (password) => {
   if (!password) return false;
 
-  const tieneMinimo8 = password.length >= 8;
+  const tieneMinimo8   = password.length >= 8;
   const tieneMayuscula = /[A-Z]/.test(password);
   const tieneMinuscula = /[a-z]/.test(password);
-  const tieneNumero = /[0-9]/.test(password);
-  const tieneSimbolo = /[^A-Za-z0-9]/.test(password);
+  const tieneNumero    = /[0-9]/.test(password);
+  const tieneSimbolo   = /[^A-Za-z0-9]/.test(password);
 
   return (
     tieneMinimo8 &&
@@ -64,6 +73,8 @@ const validarPasswordSegura = (password) => {
 };
 
 const UsuarioController = {
+
+  // Retorna el listado de todos los usuarios registrados, sin exponer contraseñas
   obtenerUsuarios: (req, res) => {
     UsuarioModel.obtenerTodos((error, usuarios) => {
       if (error) {
@@ -77,6 +88,8 @@ const UsuarioController = {
     });
   },
 
+  // Registra un nuevo usuario: valida campos, verifica RUT, verifica contraseña segura,
+  // comprueba que el correo no esté duplicado y almacena la contraseña encriptada con bcrypt
   registrarUsuario: (req, res) => {
     const {
       nombre,
@@ -140,6 +153,8 @@ const UsuarioController = {
         });
       }
 
+      // Se encripta la contraseña con bcrypt antes de guardarla;
+      // el número 10 indica cuántas veces se aplica el algoritmo (más alto = más seguro pero más lento)
       const passwordEncriptada = bcrypt.hashSync(password, 10);
 
       const nuevoUsuario = {
@@ -183,6 +198,8 @@ const UsuarioController = {
     });
   },
 
+  // Autentica a un usuario verificando el correo y comparando la contraseña
+  // con el hash almacenado usando bcrypt
   loginUsuario: (req, res) => {
     const { correo, password } = req.body || {};
 
@@ -219,6 +236,8 @@ const UsuarioController = {
         });
       }
 
+      // Se compara la contraseña ingresada contra el hash almacenado en la base de datos.
+      // bcrypt nunca desencripta: vuelve a hashear y compara el resultado
       const passwordCorrecta = bcrypt.compareSync(password, usuario.password);
 
       if (!passwordCorrecta) {
@@ -245,6 +264,8 @@ const UsuarioController = {
     });
   },
 
+  // Actualiza los datos personales del usuario.
+  // Verifica que el correo nuevo no pertenezca a otro usuario antes de guardar
   actualizarUsuario: (req, res) => {
     const { id } = req.params;
 
@@ -352,8 +373,11 @@ const UsuarioController = {
         );
       });
     });
-  }, 
-    actualizarPassword: (req, res) => {
+  },
+
+  // Cambia la contraseña del usuario verificando primero que la actual sea correcta.
+  // La nueva contraseña pasa por la misma política de seguridad que el registro
+  actualizarPassword: (req, res) => {
     const { id } = req.params;
 
     const {
@@ -401,6 +425,8 @@ const UsuarioController = {
         });
       }
 
+      // Se compara la contraseña ingresada contra el hash almacenado en la base de datos.
+      // bcrypt nunca desencripta: vuelve a hashear y compara el resultado
       const passwordActualCorrecta = bcrypt.compareSync(
         passwordActual,
         usuario.password
@@ -412,6 +438,7 @@ const UsuarioController = {
         });
       }
 
+      // Se encripta la nueva contraseña con bcrypt antes de guardarla
       const nuevaPasswordEncriptada = bcrypt.hashSync(nuevaPassword, 10);
 
       UsuarioModel.actualizarPassword(
