@@ -88,7 +88,7 @@ CREATE TABLE movimiento_inventario (
     stock_nuevo INTEGER NOT NULL,
     motivo TEXT NOT NULL,
     observacion TEXT,
-    fecha_movimiento TEXT DEFAULT CURRENT_TIMESTAMP,
+    fecha_movimiento DATETIME DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (id_producto) REFERENCES producto(id_producto),
     FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario)
@@ -102,7 +102,8 @@ CREATE TABLE venta (
     tipo_documento TEXT NOT NULL,
     codigo_dte INTEGER DEFAULT 39,
     folio INTEGER,
-    fecha_venta TEXT DEFAULT CURRENT_TIMESTAMP,
+    fecha_venta DATETIME DEFAULT CURRENT_TIMESTAMP,
+    fecha_emision DATETIME DEFAULT CURRENT_TIMESTAMP,
     subtotal INTEGER NOT NULL,
     iva INTEGER NOT NULL,
     total INTEGER NOT NULL,
@@ -140,11 +141,12 @@ CREATE TABLE dim_producto (
 
 CREATE TABLE dim_tiempo (
     id_tiempo INTEGER PRIMARY KEY AUTOINCREMENT,
-    fecha TEXT NOT NULL UNIQUE,
-    dia INTEGER NOT NULL,
-    mes INTEGER NOT NULL,
-    anio INTEGER NOT NULL,
-    nombre_mes TEXT NOT NULL
+    fecha DATE NOT NULL,
+    dia INTEGER,
+    mes INTEGER,
+    anio INTEGER,
+    nombre_mes TEXT,
+    trimestre INTEGER
 );
 
 CREATE TABLE dim_cliente_tipo (
@@ -176,7 +178,7 @@ CREATE TABLE documento_xml (
     id_venta INTEGER NOT NULL,
     nombre_archivo TEXT NOT NULL,
     contenido_xml TEXT NOT NULL,
-    fecha_generacion TEXT DEFAULT CURRENT_TIMESTAMP,
+    fecha_generacion DATETIME DEFAULT CURRENT_TIMESTAMP,
     estado_xml TEXT DEFAULT 'GENERADO',
     FOREIGN KEY (id_venta) REFERENCES venta(id_venta)
 );

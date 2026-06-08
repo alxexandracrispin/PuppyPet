@@ -236,6 +236,11 @@ function AdminInventario() {
         navigate("/login");
     };
 
+    const formatearFecha = (fechaStr) => {
+        const fecha = new Date(fechaStr);
+        return fecha.toLocaleString("es-CL");
+    };
+
     const productosCriticos = productos.filter(
         (producto) => producto.estado_stock === "ROJO"
     );
@@ -416,7 +421,7 @@ function AdminInventario() {
 
                                                                         <Button
                                                                             size="sm"
-                                                                            variant="outline-warning"
+                                                                            variant="outline-secondary"
                                                                             onClick={() => abrirModalUmbrales(producto)}
                                                                         >
                                                                             Semáforo
@@ -466,7 +471,7 @@ function AdminInventario() {
                                                         ) : (
                                                             movimientos.map((movimiento) => (
                                                                 <tr key={movimiento.id_movimiento}>
-                                                                    <td>{movimiento.fecha_movimiento}</td>
+                                                                    <td>{formatearFecha(movimiento.fecha_movimiento)}</td>
                                                                     <td>{movimiento.nombre_producto}</td>
                                                                     <td>
                                                                         <Badge
