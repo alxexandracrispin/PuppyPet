@@ -60,10 +60,11 @@ const VentaController = {
       total: totales.total
     };
 
-    db.serialize(() => {
-      db.run("BEGIN TRANSACTION");
+    const procesarVenta = () => {
+      db.serialize(() => {
+        db.run("BEGIN TRANSACTION");
 
-      VentaModel.crearVenta(venta, (errorVenta, idVenta) => {
+        VentaModel.crearVenta(venta, (errorVenta, idVenta) => {
         if (errorVenta) {
           db.run("ROLLBACK");
           return res.status(500).json({
@@ -194,6 +195,30 @@ const VentaController = {
         });
       });
     });
+    };
+
+    if (idUsuario) {
+      db.get(
+        "SELECT id_usuario FROM usuario WHERE id_usuario = ?",
+        [idUsuario],
+        (errUser, usuarioRow) => {
+          if (errUser) {
+            return res.status(500).json({
+              mensaje: "Error al validar sesión",
+              error: errUser.message
+            });
+          }
+          if (!usuarioRow) {
+            return res.status(401).json({
+              mensaje: "Sesión inválida. Por favor inicia sesión nuevamente."
+            });
+          }
+          procesarVenta();
+        }
+      );
+    } else {
+      procesarVenta();
+    }
   },
 
   obtenerVenta: (req, res) => {
