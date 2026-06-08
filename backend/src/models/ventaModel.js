@@ -10,13 +10,15 @@ const VentaModel = {
         tipo_documento,
         codigo_dte,
         folio,
+        fecha_venta,
+        fecha_emision,
         subtotal,
         iva,
         total,
         estado_venta,
         xml_generado
-      )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'GENERADA', 0)
+)
+VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?, ?, ?, 'GENERADA', 0)
     `;
 
     db.run(
