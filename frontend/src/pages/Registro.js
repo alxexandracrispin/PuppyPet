@@ -39,6 +39,7 @@ function Registro() {
     setShowModal(true);
   };
 
+  // manejarCambio actualiza solo el campo modificado usando el atributo name del input
   const manejarCambio = (event) => {
     const { name, value } = event.target;
 
@@ -48,6 +49,7 @@ function Registro() {
     });
   };
 
+  // Si el registro es exitoso se limpia el formulario para que el usuario pueda registrar otro
   const limpiarFormulario = () => {
     setFormulario({
       nombre: "",
@@ -62,10 +64,14 @@ function Registro() {
     });
   };
 
+  // Las siguientes funciones replican la validación del backend para dar feedback
+  // al usuario antes de enviar el formulario, evitando viajes innecesarios al servidor
+
   const limpiarRut = (rut) => {
     return rut.replace(/\./g, "").replace(/-/g, "").toUpperCase();
   };
 
+  // Aplica el algoritmo módulo 11 para calcular el dígito verificador del RUT
   const calcularDv = (rutNumerico) => {
     let suma = 0;
     let multiplicador = 2;
@@ -107,11 +113,11 @@ function Registro() {
   };
 
   const validarPasswordSegura = (password) => {
-    const tieneMinimo8 = password.length >= 8;
+    const tieneMinimo8   = password.length >= 8;
     const tieneMayuscula = /[A-Z]/.test(password);
     const tieneMinuscula = /[a-z]/.test(password);
-    const tieneNumero = /[0-9]/.test(password);
-    const tieneSimbolo = /[^A-Za-z0-9]/.test(password);
+    const tieneNumero    = /[0-9]/.test(password);
+    const tieneSimbolo   = /[^A-Za-z0-9]/.test(password);
 
     return (
       tieneMinimo8 &&
@@ -122,12 +128,14 @@ function Registro() {
     );
   };
 
+  // requisitosPassword se recalcula en tiempo real mientras el usuario escribe
+  // para mostrar los indicadores verdes/rojos de la política de contraseña
   const requisitosPassword = {
-    minimo8: formulario.password.length >= 8,
+    minimo8:   formulario.password.length >= 8,
     mayuscula: /[A-Z]/.test(formulario.password),
     minuscula: /[a-z]/.test(formulario.password),
-    numero: /[0-9]/.test(formulario.password),
-    simbolo: /[^A-Za-z0-9]/.test(formulario.password)
+    numero:    /[0-9]/.test(formulario.password),
+    simbolo:   /[^A-Za-z0-9]/.test(formulario.password)
   };
 
   const manejarRegistro = async (event) => {

@@ -15,6 +15,7 @@ import {
 import api from "../api/api";
 import "./AdminDashboard.css";
 
+// Formatea valores numéricos como pesos chilenos usando la API nativa de internacionalización
 const formatoPesos = (valor) => {
   return new Intl.NumberFormat("es-CL", {
     style: "currency",
@@ -27,6 +28,7 @@ const formatoNumero = (valor) => {
   return new Intl.NumberFormat("es-CL").format(valor || 0);
 };
 
+// BarraSimple es un subcomponente que dibuja una barra de progreso proporcional al valor máximo del gráfico
 function BarraSimple({ label, value, maxValue, helper, money = false }) {
   const porcentaje = maxValue > 0 ? Math.round((value / maxValue) * 100) : 0;
 
@@ -46,6 +48,7 @@ function BarraSimple({ label, value, maxValue, helper, money = false }) {
   );
 }
 
+// KpiCard es un subcomponente reutilizable para mostrar cada indicador clave del negocio
 function KpiCard({ titulo, valor, icono, variante }) {
   return (
     <Col md={6} xl={3} className="mb-3">
@@ -86,6 +89,7 @@ function AdminDashboard() {
 
     const usuarioParseado = JSON.parse(usuarioGuardado);
 
+    // Si el usuario no tiene rol ADMIN, se redirige al inicio para proteger el panel
     if (usuarioParseado.rol !== "ADMIN") {
       navigate("/");
       return;
@@ -116,6 +120,7 @@ function AdminDashboard() {
         setCargando(true);
         setError("");
 
+        // Promise.all ejecuta las 5 consultas al backend en paralelo para reducir el tiempo de carga
         const [
           responseKpis,
           responseProductos,
@@ -147,6 +152,8 @@ function AdminDashboard() {
     cargarProductosCriticos();
   }, [usuario]);
 
+  // useMemo calcula el valor máximo de cada gráfico solo cuando cambian sus datos,
+  // evitando recalcular en cada render del componente
   const maxProductos = useMemo(
     () => Math.max(...productos.map((item) => item.totalVendido || 0), 0),
     [productos]

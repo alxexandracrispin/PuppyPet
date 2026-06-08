@@ -1,4 +1,8 @@
+// Componente visual puro que muestra la boleta en pantalla.
+// No realiza llamadas a la API; recibe todos los datos como props desde VentaConfirmada
 function BoletaTicket({ venta, detalles }) {
+
+  // formatearMonto usa toLocaleString con locale chileno para mostrar separadores de miles
   const formatearMonto = (valor) => {
     return Number(valor || 0).toLocaleString("es-CL");
   };

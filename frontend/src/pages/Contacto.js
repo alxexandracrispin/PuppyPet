@@ -1,5 +1,7 @@
 import { Container, Card, Form, Button } from "react-bootstrap";
 
+// Formulario de contacto estático. No tiene conexión con el backend;
+// fue incluido como página informativa dentro del proyecto académico
 function Contacto() {
   return (
     <Container className="py-5">

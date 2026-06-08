@@ -30,6 +30,7 @@ function MisCompras() {
   useEffect(() => {
     const usuarioGuardado = localStorage.getItem("usuario");
 
+    // Si no hay sesión activa, se redirige al login
     if (!usuarioGuardado) {
       navigate("/login");
       return;
@@ -67,6 +68,8 @@ function MisCompras() {
     try {
       setCargandoDetalle(true);
       setDetalleVenta(null);
+
+      // Se abre el modal antes de tener los datos para mostrar el spinner mientras carga
       setShowModal(true);
 
       const response = await api.get(`/ventas/${idVenta}`);
@@ -86,9 +89,9 @@ function MisCompras() {
     }
   };
 
+  // formatearFecha y formatearMonto son helpers locales para presentar datos con formato chileno
   const formatearFecha = (fecha) => {
     if (!fecha) return "-";
-
     return new Date(fecha).toLocaleString("es-CL");
   };
 

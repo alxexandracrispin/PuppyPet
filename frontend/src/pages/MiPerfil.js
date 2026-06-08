@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 
 import api from "../api/api";
 
+// La página tiene dos formularios independientes: uno para datos personales y otro para contraseña
 function MiPerfil() {
   const navigate = useNavigate();
 
@@ -48,6 +49,7 @@ function MiPerfil() {
   useEffect(() => {
     const usuarioGuardado = localStorage.getItem("usuario");
 
+    // Si no hay sesión activa, se redirige al login en lugar de mostrar el perfil vacío
     if (!usuarioGuardado) {
       navigate("/login");
       return;
@@ -58,13 +60,13 @@ function MiPerfil() {
     setUsuario(usuarioParseado);
 
     setFormulario({
-      nombre: usuarioParseado.nombre || "",
-      apellido: usuarioParseado.apellido || "",
-      correo: usuarioParseado.correo || "",
-      rut: usuarioParseado.rut || "",
+      nombre:    usuarioParseado.nombre    || "",
+      apellido:  usuarioParseado.apellido  || "",
+      correo:    usuarioParseado.correo    || "",
+      rut:       usuarioParseado.rut       || "",
       direccion: usuarioParseado.direccion || "",
-      comuna: usuarioParseado.comuna || "",
-      ciudad: usuarioParseado.ciudad || ""
+      comuna:    usuarioParseado.comuna    || "",
+      ciudad:    usuarioParseado.ciudad    || ""
     });
   }, [navigate]);
 
@@ -87,11 +89,11 @@ function MiPerfil() {
   };
 
   const validarPasswordSegura = (password) => {
-    const tieneMinimo8 = password.length >= 8;
+    const tieneMinimo8   = password.length >= 8;
     const tieneMayuscula = /[A-Z]/.test(password);
     const tieneMinuscula = /[a-z]/.test(password);
-    const tieneNumero = /[0-9]/.test(password);
-    const tieneSimbolo = /[^A-Za-z0-9]/.test(password);
+    const tieneNumero    = /[0-9]/.test(password);
+    const tieneSimbolo   = /[^A-Za-z0-9]/.test(password);
 
     return (
       tieneMinimo8 &&
@@ -102,14 +104,14 @@ function MiPerfil() {
     );
   };
 
+  // requisitosPassword se recalcula en tiempo real para mostrar los indicadores de la política
   const requisitosPassword = {
-    minimo8: formularioPassword.nuevaPassword.length >= 8,
+    minimo8:   formularioPassword.nuevaPassword.length >= 8,
     mayuscula: /[A-Z]/.test(formularioPassword.nuevaPassword),
     minuscula: /[a-z]/.test(formularioPassword.nuevaPassword),
-    numero: /[0-9]/.test(formularioPassword.nuevaPassword),
-    simbolo: /[^A-Za-z0-9]/.test(formularioPassword.nuevaPassword)
+    numero:    /[0-9]/.test(formularioPassword.nuevaPassword),
+    simbolo:   /[^A-Za-z0-9]/.test(formularioPassword.nuevaPassword)
   };
-
 
   const validarCampos = () => {
     if (
@@ -140,12 +142,12 @@ function MiPerfil() {
     }
 
     const datosActualizados = {
-      nombre: formulario.nombre,
-      apellido: formulario.apellido,
-      correo: formulario.correo,
+      nombre:    formulario.nombre,
+      apellido:  formulario.apellido,
+      correo:    formulario.correo,
       direccion: formulario.direccion,
-      comuna: formulario.comuna,
-      ciudad: formulario.ciudad
+      comuna:    formulario.comuna,
+      ciudad:    formulario.ciudad
     };
 
     try {
@@ -161,6 +163,8 @@ function MiPerfil() {
         ...datosActualizados
       };
 
+      // Se sincroniza el localStorage con los nuevos datos
+      // y se dispara el evento para que la Navbar actualice el nombre del usuario
       localStorage.setItem("usuario", JSON.stringify(usuarioActualizado));
       window.dispatchEvent(new Event("usuarioActualizado"));
 

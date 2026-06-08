@@ -7,11 +7,13 @@ function ProductoCard({ producto, onAgregar }) {
   const navigate = useNavigate();
 
   return (
+    // El onClick de la Card navega al detalle del producto al hacer clic en cualquier parte
     <Card
       className="h-100 shadow-sm producto-card producto-card-dark"
       style={{ cursor: "pointer" }}
       onClick={() => navigate(`/producto/${producto.id_producto}`)}
     >
+      {/* imagen_url con fallback a imagen por defecto si el producto no tiene foto */}
       <Card.Img
         variant="top"
         src={producto.imagen_url || "/assets/images/default-producto.png"}
@@ -47,7 +49,7 @@ function ProductoCard({ producto, onAgregar }) {
           className="w-100 fw-bold"
           disabled={producto.stock <= 0}
           onClick={(event) => {
-            event.stopPropagation();
+            event.stopPropagation(); // Evita que el clic en el botón también active el onClick de la Card
             onAgregar(producto);
           }}
         >

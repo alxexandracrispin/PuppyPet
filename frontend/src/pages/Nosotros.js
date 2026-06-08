@@ -2,7 +2,9 @@ import { Container, Row, Col, Card } from "react-bootstrap";
 import { FaPaw } from "react-icons/fa";
 import { GiClover} from "react-icons/gi"
 
+// Página estática que muestra el equipo de desarrollo y el objetivo del proyecto académico
 function Nosotros() {
+  // Array con los integrantes del equipo, se recorre para generar una tarjeta por persona
   const tarjetas = [
     {
       titulo: "Alexandra Crispín Yáñez",

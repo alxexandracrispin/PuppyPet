@@ -22,15 +22,21 @@ function NavbarPrincipal() {
 
     cargarUsuario();
 
+    // Se escucha el evento personalizado "usuarioActualizado" para refrescar el menú
+    // cuando el usuario inicia sesión, cierra sesión o actualiza sus datos desde el perfil
     window.addEventListener("usuarioActualizado", cargarUsuario);
+
+    // "storage" detecta cambios en localStorage desde otras pestañas del navegador
     window.addEventListener("storage", cargarUsuario);
 
+    // cleanup: se eliminan los listeners al desmontar el componente para evitar fugas de memoria
     return () => {
       window.removeEventListener("usuarioActualizado", cargarUsuario);
       window.removeEventListener("storage", cargarUsuario);
     };
-  }, [location.pathname]);
+  }, [location.pathname]); // se re-ejecuta al cambiar de página para mantener el estado sincronizado
 
+  // totalItems suma las cantidades de todos los productos para mostrar el número en el badge del carrito
   const totalItems = carrito.reduce((total, item) => {
     return total + item.cantidad;
   }, 0);
@@ -94,8 +100,7 @@ function NavbarPrincipal() {
               NOSOTROS
             </Nav.Link>
 
-
-
+            {/* El menú muestra opciones distintas dependiendo de si hay sesión activa o no */}
             {usuario ? (
               <>
                 <Nav.Link as={Link} to="/perfil" className="perfil-nav-badge text-center">
@@ -107,8 +112,7 @@ function NavbarPrincipal() {
                   MIS COMPRAS
                 </Nav.Link>
 
-
-
+                {/* Si el usuario tiene rol ADMIN, aparece el acceso al panel de administración */}
                 {usuario.rol === "ADMIN" && (
                   <Nav.Link as={Link} to="/admin">
                     <FaChartBar className="nav-icon" />
@@ -131,14 +135,8 @@ function NavbarPrincipal() {
                   <FaSignInAlt className="nav-icon" />
                   INICIAR SESIÓN
                 </Nav.Link>
-
               </>
             )}
-
-
-
-
-
 
             <Nav.Link as={Link} to="/carrito" className="cart-link">
               <FaShoppingCart className="nav-icon" />

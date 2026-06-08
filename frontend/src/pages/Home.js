@@ -2,6 +2,8 @@ import { Container, Row, Col, Button, Card } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 function Home() {
+  // Array estático que define las categorías del home.
+  // Cada objeto incluye la ruta al catálogo filtrado por esa categoría
   const categorias = [
     {
       nombre: "Productos para perros",
@@ -43,6 +45,7 @@ function Home() {
 
   return (
     <>
+      {/* Sección hero con imagen de fondo aplicada mediante estilos en línea */}
       <section
         className="hero-section"
         style={{
@@ -68,6 +71,7 @@ function Home() {
         </Container>
       </section>
 
+      {/* Se recorre el array de categorías para generar una tarjeta por cada una */}
       <Container className="py-5">
         <h2 className="section-title">PRODUCTOS DESTACADOS</h2>
 
