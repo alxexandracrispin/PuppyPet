@@ -1,11 +1,13 @@
 const db = require("../config/database");
 
-const ProductoModel = require("../models/productoModel");
-const VentaModel = require("../models/ventaModel");
+const ProductoModel     = require("../models/productoModel");
+const VentaModel        = require("../models/ventaModel");
 const DocumentoXmlModel = require("../models/documentoXmlModel");
 
 const { generarXmlBoleta } = require("../services/generadorXmlService");
 
+// Calcula subtotal (sin IVA), IVA y total desde los ítems del carrito.
+// El total ya incluye IVA; el subtotal se obtiene dividiendo por 1.19
 function calcularTotalesDesdeItems(items) {
   const total = items.reduce((acumulador, item) => {
     return acumulador + item.subtotalLinea;
@@ -22,6 +24,11 @@ function calcularTotalesDesdeItems(items) {
 }
 
 const VentaController = {
+
+  // Orquesta el flujo completo de una compra dentro de una transacción SQLite:
+  // 1. Valida sesión si hay usuario, 2. Crea la venta, 3. Inserta cada detalle,
+  // 4. Descuenta stock, 5. Alimenta el modelo estrella BI, 6. Genera y guarda el XML.
+  // Si algún paso falla, se ejecuta ROLLBACK para revertir todos los cambios
   confirmarVentaDirecta: (req, res) => {
     const {
       idUsuario,
@@ -65,138 +72,139 @@ const VentaController = {
         db.run("BEGIN TRANSACTION");
 
         VentaModel.crearVenta(venta, (errorVenta, idVenta) => {
-        if (errorVenta) {
-          db.run("ROLLBACK");
-          return res.status(500).json({
-            mensaje: "Error al crear venta",
-            error: errorVenta.message
-          });
-        }
+          if (errorVenta) {
+            db.run("ROLLBACK");
+            return res.status(500).json({
+              mensaje: "Error al crear venta",
+              error: errorVenta.message
+            });
+          }
 
-        let procesados = 0;
-        let errorDetectado = false;
+          let procesados = 0;
+          let errorDetectado = false;
 
-        items.forEach((item) => {
-          const detalle = {
-            id_producto: item.idProducto,
-            cantidad: item.cantidad,
-            precio_unitario: item.precioUnitario,
-            subtotal_linea: item.subtotalLinea
-          };
+          items.forEach((item) => {
+            const detalle = {
+              id_producto:    item.idProducto,
+              cantidad:       item.cantidad,
+              precio_unitario: item.precioUnitario,
+              subtotal_linea: item.subtotalLinea
+            };
 
-          VentaModel.crearDetalle(idVenta, detalle, (errorDetalle) => {
-            if (errorDetectado) return;
+            VentaModel.crearDetalle(idVenta, detalle, (errorDetalle) => {
+              if (errorDetectado) return;
 
-            if (errorDetalle) {
-              errorDetectado = true;
+              if (errorDetalle) {
+                errorDetectado = true;
+                db.run("ROLLBACK");
+                return res.status(500).json({
+                  mensaje: "Error al crear detalle de venta",
+                  error: errorDetalle.message
+                });
+              }
 
-              db.run("ROLLBACK");
-              return res.status(500).json({
-                mensaje: "Error al crear detalle de venta",
-                error: errorDetalle.message
-              });
-            }
+              ProductoModel.descontarStock(
+                item.idProducto,
+                item.cantidad,
+                (errorStock, resultadoStock) => {
+                  if (errorDetectado) return;
 
-            ProductoModel.descontarStock(
-              item.idProducto,
-              item.cantidad,
-              (errorStock, resultadoStock) => {
-                if (errorDetectado) return;
+                  if (errorStock || resultadoStock.changes === 0) {
+                    errorDetectado = true;
+                    db.run("ROLLBACK");
+                    return res.status(400).json({
+                      mensaje: "Error al descontar stock o stock insuficiente"
+                    });
+                  }
 
-                if (errorStock || resultadoStock.changes === 0) {
-                  errorDetectado = true;
+                  procesados++;
 
-                  db.run("ROLLBACK");
-                  return res.status(400).json({
-                    mensaje: "Error al descontar stock o stock insuficiente"
-                  });
-                }
+                  // Solo cuando todos los ítems fueron procesados se continúa con BI y XML
+                  if (procesados === items.length) {
+                    VentaModel.registrarHechosVenta(idVenta, (errorHechos) => {
+                      if (errorHechos) {
+                        db.run("ROLLBACK");
+                        return res.status(500).json({
+                          mensaje: "Error al registrar hechos de venta para el dashboard",
+                          error: errorHechos.message
+                        });
+                      }
 
-                procesados++;
+                      VentaModel.obtenerVentaCompleta(
+                        idVenta,
+                        (errorVentaCompleta, dataVenta) => {
+                          if (errorVentaCompleta) {
+                            db.run("ROLLBACK");
+                            return res.status(500).json({
+                              mensaje: "Error al obtener venta completa",
+                              error: errorVentaCompleta.message
+                            });
+                          }
 
-                if (procesados === items.length) {
-                  VentaModel.registrarHechosVenta(idVenta, (errorHechos) => {
-                    if (errorHechos) {
-                      db.run("ROLLBACK");
-                      return res.status(500).json({
-                        mensaje: "Error al registrar hechos de venta para el dashboard",
-                        error: errorHechos.message
-                      });
-                    }
+                          if (!dataVenta) {
+                            db.run("ROLLBACK");
+                            return res.status(404).json({
+                              mensaje: "No se encontró la venta generada"
+                            });
+                          }
 
-                    VentaModel.obtenerVentaCompleta(
-                      idVenta,
-                      (errorVentaCompleta, dataVenta) => {
-                        if (errorVentaCompleta) {
-                          db.run("ROLLBACK");
-                          return res.status(500).json({
-                            mensaje: "Error al obtener venta completa",
-                            error: errorVentaCompleta.message
-                          });
-                        }
+                          // Se genera el XML de la boleta electrónica a partir de los datos de la venta
+                          const contenidoXml  = generarXmlBoleta(dataVenta);
+                          const nombreArchivo = `boleta_${idVenta}.xml`;
 
-                        if (!dataVenta) {
-                          db.run("ROLLBACK");
-                          return res.status(404).json({
-                            mensaje: "No se encontró la venta generada"
-                          });
-                        }
-
-                        const contenidoXml = generarXmlBoleta(dataVenta);
-                        const nombreArchivo = `boleta_${idVenta}.xml`;
-
-                        DocumentoXmlModel.guardarXml(
-                          idVenta,
-                          nombreArchivo,
-                          contenidoXml,
-                          (errorXml, idDocumentoXml) => {
-                            if (errorXml) {
-                              db.run("ROLLBACK");
-                              return res.status(500).json({
-                                mensaje: "Error al guardar XML",
-                                error: errorXml.message
-                              });
-                            }
-
-                            VentaModel.marcarXmlGenerado(
-                              idVenta,
-                              (errorMarcarXml) => {
-                                if (errorMarcarXml) {
-                                  db.run("ROLLBACK");
-                                  return res.status(500).json({
-                                    mensaje: "Error al marcar XML generado",
-                                    error: errorMarcarXml.message
-                                  });
-                                }
-
-                                db.run("COMMIT");
-
-                                return res.status(201).json({
-                                  mensaje:
-                                    "Venta confirmada y XML generado correctamente",
-                                  idVenta,
-                                  idDocumentoXml,
-                                  nombreArchivo,
-                                  venta: dataVenta.venta,
-                                  detalles: dataVenta.detalles,
-                                  xml: contenidoXml
+                          DocumentoXmlModel.guardarXml(
+                            idVenta,
+                            nombreArchivo,
+                            contenidoXml,
+                            (errorXml, idDocumentoXml) => {
+                              if (errorXml) {
+                                db.run("ROLLBACK");
+                                return res.status(500).json({
+                                  mensaje: "Error al guardar XML",
+                                  error: errorXml.message
                                 });
                               }
-                            );
-                          }
-                        );
-                      }
-                    );
-                  });
+
+                              VentaModel.marcarXmlGenerado(
+                                idVenta,
+                                (errorMarcarXml) => {
+                                  if (errorMarcarXml) {
+                                    db.run("ROLLBACK");
+                                    return res.status(500).json({
+                                      mensaje: "Error al marcar XML generado",
+                                      error: errorMarcarXml.message
+                                    });
+                                  }
+
+                                  // Se confirma la transacción solo cuando todo el flujo fue exitoso
+                                  db.run("COMMIT");
+
+                                  return res.status(201).json({
+                                    mensaje: "Venta confirmada y XML generado correctamente",
+                                    idVenta,
+                                    idDocumentoXml,
+                                    nombreArchivo,
+                                    venta:    dataVenta.venta,
+                                    detalles: dataVenta.detalles,
+                                    xml:      contenidoXml
+                                  });
+                                }
+                              );
+                            }
+                          );
+                        }
+                      );
+                    });
+                  }
                 }
-              }
-            );
+              );
+            });
           });
         });
       });
-    });
     };
 
+    // Si hay usuario activo se verifica que su sesión sea válida antes de procesar la venta
     if (idUsuario) {
       db.get(
         "SELECT id_usuario FROM usuario WHERE id_usuario = ?",
@@ -221,6 +229,7 @@ const VentaController = {
     }
   },
 
+  // Retorna la venta completa (encabezado + detalles) para visualizar la boleta
   obtenerVenta: (req, res) => {
     const { idVenta } = req.params;
 
@@ -242,6 +251,7 @@ const VentaController = {
     });
   },
 
+  // Retorna el historial de compras de un usuario registrado ordenado por fecha
   obtenerVentasPorUsuario: (req, res) => {
     const { idUsuario } = req.params;
 
@@ -266,6 +276,8 @@ const VentaController = {
     });
   },
 
+  // Retorna el contenido XML de la boleta electrónica de una venta.
+  // Se envía con Content-Type application/xml para que el navegador lo descargue correctamente
   obtenerXml: (req, res) => {
     const { idVenta } = req.params;
 

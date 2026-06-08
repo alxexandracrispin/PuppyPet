@@ -1,5 +1,10 @@
+// Script de migración que crea las tablas del modelo estrella y las pobla
+// con los datos históricos de ventas que ya existían en la base de datos operacional.
+// Se ejecuta una sola vez cuando se activa el módulo de dashboard BI
 const db = require("../config/database");
 
+// Crea las 5 tablas del modelo estrella si no existen:
+// dim_categoria, dim_producto, dim_tiempo, dim_cliente_tipo y hecho_venta
 const crearTablasBi = `
 CREATE TABLE IF NOT EXISTS dim_categoria (
     id_categoria INTEGER PRIMARY KEY,
@@ -43,6 +48,8 @@ CREATE TABLE IF NOT EXISTS hecho_venta (
 );
 `;
 
+// Pobla las dimensiones copiando datos desde las tablas operacionales.
+// Luego reconstruye hecho_venta completo desde las ventas históricas
 const poblarBi = `
 INSERT OR IGNORE INTO dim_cliente_tipo (id_cliente_tipo, tipo_cliente)
 VALUES
@@ -130,6 +137,8 @@ INNER JOIN producto p ON dv.id_producto = p.id_producto
 INNER JOIN dim_tiempo t ON t.fecha = DATE(v.fecha_venta);
 `;
 
+// Se ejecutan los dos bloques SQL en secuencia:
+// primero la creación de tablas, luego la población de datos
 db.serialize(() => {
   db.exec(crearTablasBi, (errorCrear) => {
     if (errorCrear) {

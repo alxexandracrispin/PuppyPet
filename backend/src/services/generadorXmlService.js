@@ -1,3 +1,5 @@
+// Reemplaza caracteres especiales que romperían la estructura XML.
+// &, < y > tienen significado propio en XML y deben escaparse antes de insertarse en etiquetas
 function limpiarTexto(valor) {
   if (!valor) return "";
   return String(valor)
@@ -6,11 +8,15 @@ function limpiarTexto(valor) {
     .replace(/>/g, "&gt;");
 }
 
+// Convierte la fecha de la venta al formato YYYY-MM-DD requerido por el estándar DTE del SII.
+// toISOString() retorna un string como "2025-06-07T12:00:00.000Z"; el split toma solo la parte de la fecha
 function obtenerFechaXml(fechaVenta) {
   const fecha = new Date(fechaVenta);
   return fecha.toISOString().split("T")[0];
 }
 
+// Construye el XML completo de la boleta electrónica según el formato DTE versión 1.0 del SII.
+// Recorre cada producto de la venta para generar un bloque <Detalle> por línea
 function generarXmlBoleta(data) {
   const { venta, detalles } = data;
 

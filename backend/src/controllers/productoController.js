@@ -1,6 +1,8 @@
 const ProductoModel = require("../models/productoModel");
 
 const ProductoController = {
+
+  // Retorna todos los productos activos del catálogo con su categoría
   obtenerProductos: (req, res) => {
     ProductoModel.obtenerTodos((error, productos) => {
       if (error) {
@@ -14,6 +16,8 @@ const ProductoController = {
     });
   },
 
+  // Retorna los productos filtrados por nombre de categoría.
+  // El parámetro llega desde la URL: GET /productos/categoria/:categoria
   obtenerProductosPorCategoria: (req, res) => {
     const { categoria } = req.params;
 
@@ -29,6 +33,8 @@ const ProductoController = {
     });
   },
 
+  // Retorna el detalle de un producto específico por su ID.
+  // Responde 404 si el producto no existe
   obtenerProductoPorId: (req, res) => {
     const { id } = req.params;
 
