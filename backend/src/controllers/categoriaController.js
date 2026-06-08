@@ -1,6 +1,8 @@
 const CategoriaModel = require("../models/categoriaModel");
 
 const CategoriaController = {
+
+  // Retorna todas las categorías activas para poblar el selector del catálogo
   obtenerCategorias: (req, res) => {
     CategoriaModel.obtenerTodas((error, categorias) => {
       if (error) {
