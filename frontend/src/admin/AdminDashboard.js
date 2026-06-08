@@ -197,6 +197,9 @@ function AdminDashboard() {
           <button type="button" onClick={() => navigate("/admin/inventario")}>
             <FaShoppingBasket /> Inventario
           </button>
+          <button type="button" onClick={() => navigate("/admin/usuarios")}>
+            <FaUsers /> Usuarios
+          </button>
           <button type="button" onClick={() => navigate("/")}>
             <FaHome /> Volver a tienda
           </button>

@@ -20,7 +20,8 @@ import {
     FaChartBar,
     FaHome,
     FaPaw,
-    FaSignOutAlt
+    FaSignOutAlt,
+    FaUsers
 } from "react-icons/fa";
 import api from "../../api/api";
 import "../AdminDashboard.css";
@@ -261,6 +262,10 @@ function AdminInventario() {
 
                     <button className="active" type="button">
                         <FaBoxOpen /> Inventario
+                    </button>
+
+                    <button type="button" onClick={() => navigate("/admin/usuarios")}>
+                        <FaUsers /> Usuarios
                     </button>
 
                     <button type="button" onClick={() => navigate("/")}>

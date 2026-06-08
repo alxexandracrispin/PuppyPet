@@ -15,6 +15,7 @@ import MisCompras from "./pages/MisCompras";
 import AdminDashboard from "./admin/AdminDashboard";
 
 import AdminInventario from "./admin/inventario/AdminInventario";
+import AdminUsuarios from "./admin/AdminUsuarios";
 
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
         {/* Las rutas de admin van sin Layout para tener su propio panel sin navbar ni footer */}
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/inventario" element={<AdminInventario />} />
+        <Route path="/admin/usuarios" element={<AdminUsuarios />} />
 
         {/* Layout actúa como contenedor principal: renderiza Navbar, el contenido de la ruta activa (Outlet) y Footer */}
         <Route path="/" element={<Layout />}>
