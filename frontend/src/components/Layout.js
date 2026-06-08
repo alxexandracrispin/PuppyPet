@@ -7,6 +7,7 @@ function Layout() {
     <>
       <NavbarPrincipal />
 
+      {/* Outlet renderiza la página correspondiente a la ruta activa en ese momento */}
       <main className="min-vh-100">
         <Outlet />
       </main>

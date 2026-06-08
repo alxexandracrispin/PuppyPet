@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+// useParams extrae parámetros de la URL, en este caso el nombre de categoría
 import { useParams } from "react-router-dom";
 import { Container, Row, Col, Alert, Spinner } from "react-bootstrap";
 
@@ -6,12 +7,14 @@ import api from "../api/api";
 import ProductoCard from "../components/ProductoCard";
 
 function Catalogo() {
+    // useParams extrae el parámetro :categoria de la URL (ej: /catalogo/Perros → categoria = "Perros")
     const { categoria } = useParams();
 
     const [productos, setProductos] = useState([]);
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState("");
 
+    // El useEffect se re-ejecuta cada vez que cambia la categoría en la URL
     useEffect(() => {
         cargarProductos();
     }, [categoria]);
@@ -21,6 +24,7 @@ function Catalogo() {
             setCargando(true);
             setError("");
 
+            // Si hay categoría en la URL se llama al endpoint filtrado; si no, se obtienen todos los productos
             const endpoint = categoria
                 ? `/productos/categoria/${categoria}`
                 : "/productos";
@@ -35,6 +39,8 @@ function Catalogo() {
     };
 
     const agregarAlCarrito = (producto) => {
+        // El carrito se guarda en localStorage para que persista si el usuario navega entre páginas.
+        // Si el producto ya existe, se incrementa la cantidad en lugar de duplicarlo
         const carritoActual = JSON.parse(localStorage.getItem("carrito")) || [];
 
         const productoExistente = carritoActual.find(

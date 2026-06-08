@@ -464,6 +464,116 @@ const UsuarioController = {
         }
       );
     });
+  },
+
+  // Retorna los datos públicos de un usuario específico por su ID
+  obtenerUsuario: (req, res) => {
+    const { id } = req.params;
+
+    UsuarioModel.obtenerPorId(id, (error, usuario) => {
+      if (error) {
+        return res.status(500).json({
+          mensaje: "Error al obtener usuario",
+          error: error.message
+        });
+      }
+
+      if (!usuario) {
+        return res.status(404).json({ mensaje: "Usuario no encontrado" });
+      }
+
+      return res.json(usuario);
+    });
+  },
+
+  // Cambia el rol de un usuario entre CLIENTE y ADMIN.
+  // Valida que el valor enviado sea uno de los dos roles permitidos
+  actualizarRol: (req, res) => {
+    const { id } = req.params;
+    const { rol } = req.body || {};
+
+    const rolesPermitidos = ["CLIENTE", "ADMIN"];
+
+    if (!rol || !rolesPermitidos.includes(rol)) {
+      return res.status(400).json({ mensaje: "El rol debe ser CLIENTE o ADMIN" });
+    }
+
+    UsuarioModel.obtenerPorId(id, (errorBuscar, usuario) => {
+      if (errorBuscar) {
+        return res.status(500).json({
+          mensaje: "Error al buscar usuario",
+          error: errorBuscar.message
+        });
+      }
+
+      if (!usuario) {
+        return res.status(404).json({ mensaje: "Usuario no encontrado" });
+      }
+
+      UsuarioModel.actualizarRol(id, rol, (errorActualizar, cambios) => {
+        if (errorActualizar) {
+          return res.status(500).json({
+            mensaje: "Error al actualizar rol",
+            error: errorActualizar.message
+          });
+        }
+
+        if (cambios === 0) {
+          return res.status(400).json({ mensaje: "No se realizaron cambios" });
+        }
+
+        return res.json({
+          mensaje: "Rol actualizado correctamente",
+          idUsuario: Number(id),
+          rol
+        });
+      });
+    });
+  },
+
+  // Activa o desactiva un usuario.
+  // Un usuario INACTIVO no puede autenticarse aunque sus credenciales sean correctas
+  actualizarEstado: (req, res) => {
+    const { id } = req.params;
+    const { estado } = req.body || {};
+
+    const estadosPermitidos = ["ACTIVO", "INACTIVO"];
+
+    if (!estado || !estadosPermitidos.includes(estado)) {
+      return res.status(400).json({ mensaje: "El estado debe ser ACTIVO o INACTIVO" });
+    }
+
+    UsuarioModel.obtenerPorId(id, (errorBuscar, usuario) => {
+      if (errorBuscar) {
+        return res.status(500).json({
+          mensaje: "Error al buscar usuario",
+          error: errorBuscar.message
+        });
+      }
+
+      if (!usuario) {
+        return res.status(404).json({ mensaje: "Usuario no encontrado" });
+      }
+
+      UsuarioModel.actualizarEstado(id, estado, (errorActualizar, cambios) => {
+        if (errorActualizar) {
+          return res.status(500).json({
+            mensaje: "Error al actualizar estado",
+            error: errorActualizar.message
+          });
+        }
+
+        if (cambios === 0) {
+          return res.status(400).json({ mensaje: "No se realizaron cambios" });
+        }
+
+        return res.json({
+          mensaje: "Estado actualizado correctamente",
+          idUsuario: Number(id),
+          estado
+        });
+      });
+    });
   }
 };
 

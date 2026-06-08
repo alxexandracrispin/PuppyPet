@@ -10,6 +10,7 @@ import {
   Modal
 } from "react-bootstrap";
 import { FaSignInAlt } from "react-icons/fa";
+// useNavigate permite redirigir al usuario después del login exitoso
 import { useNavigate } from "react-router-dom";
 
 import api from "../api/api";
@@ -17,6 +18,7 @@ import api from "../api/api";
 function Login() {
   const navigate = useNavigate();
 
+  // Estado que centraliza los valores del formulario en un solo objeto
   const [formulario, setFormulario] = useState({
     correo: "",
     password: ""
@@ -31,6 +33,7 @@ function Login() {
     setShowModal(true);
   };
 
+  // manejarCambio actualiza solo el campo modificado usando el atributo name del input
   const manejarCambio = (event) => {
     const { name, value } = event.target;
 
@@ -41,7 +44,7 @@ function Login() {
   };
 
   const manejarLogin = async (event) => {
-    event.preventDefault();
+    event.preventDefault(); // Evita que el formulario recargue la página al enviarse
 
     if (!formulario.correo || !formulario.password) {
       mostrarPopup("Correo y contraseña son obligatorios.");
@@ -60,11 +63,14 @@ function Login() {
         return;
       }
 
+      // Se guarda el usuario en localStorage para que persista entre páginas
       localStorage.setItem("usuario", JSON.stringify(usuario));
+
+      // Se dispara un evento personalizado para que la Navbar actualice el menú inmediatamente
       window.dispatchEvent(new Event("usuarioActualizado"));
 
       navigate("/");
-      
+
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
 

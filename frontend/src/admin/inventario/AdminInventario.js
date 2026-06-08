@@ -20,7 +20,8 @@ import {
     FaChartBar,
     FaHome,
     FaPaw,
-    FaSignOutAlt
+    FaSignOutAlt,
+    FaUsers
 } from "react-icons/fa";
 import api from "../../api/api";
 import "../AdminDashboard.css";
@@ -60,6 +61,7 @@ function AdminInventario() {
 
         const usuarioParseado = JSON.parse(usuarioGuardado);
 
+        // Si el usuario no tiene rol ADMIN, se redirige al inicio para proteger el panel
         if (usuarioParseado.rol !== "ADMIN") {
             navigate("/");
             return;
@@ -68,6 +70,7 @@ function AdminInventario() {
         setUsuario(usuarioParseado);
     }, [navigate]);
 
+    // Promise.all carga productos y movimientos en paralelo al montar la vista
     const cargarDatos = async () => {
         try {
             setCargando(true);
@@ -94,9 +97,10 @@ function AdminInventario() {
         }
     }, [usuario]);
 
+    // abrirModal recibe el producto y el tipo (ENTRADA/SALIDA) para reutilizar el mismo modal
     const abrirModal = (producto, tipo) => {
         setProductoSeleccionado(producto);
-        setTipoMovimiento(tipo);
+        setTipoMovimiento(tipo); // determina si el formulario suma o resta stock
         setCantidad("");
         setMotivo("");
         setObservacion("");
@@ -111,6 +115,7 @@ function AdminInventario() {
         setProductoSeleccionado(null);
         setErrorModal("");
     };
+
     const registrarMovimiento = async (evento) => {
         evento.preventDefault();
 
@@ -140,8 +145,7 @@ function AdminInventario() {
 
             setMensaje("Movimiento registrado correctamente.");
             cerrarModal();
-            cargarDatos();
-
+            cargarDatos(); // Se recargan los datos para reflejar el nuevo stock
         }
         catch (errorMovimiento) {
             console.error("Error al registrar movimiento:", errorMovimiento);
@@ -206,27 +210,17 @@ function AdminInventario() {
         }
     };
 
+    // obtenerBadgeStock y obtenerTextoStock traducen el estado ROJO/AMARILLO/VERDE
+    // al color y texto del Badge de React Bootstrap
     const obtenerBadgeStock = (producto) => {
-        if (producto.estado_stock === "ROJO") {
-            return "danger";
-        }
-
-        if (producto.estado_stock === "AMARILLO") {
-            return "warning";
-        }
-
+        if (producto.estado_stock === "ROJO")    return "danger";
+        if (producto.estado_stock === "AMARILLO") return "warning";
         return "success";
     };
 
     const obtenerTextoStock = (producto) => {
-        if (producto.estado_stock === "ROJO") {
-            return "Stock crítico";
-        }
-
-        if (producto.estado_stock === "AMARILLO") {
-            return "Cercano al crítico";
-        }
-
+        if (producto.estado_stock === "ROJO")    return "Stock crítico";
+        if (producto.estado_stock === "AMARILLO") return "Cercano al crítico";
         return "Stock ideal";
     };
 
@@ -245,11 +239,9 @@ function AdminInventario() {
         (producto) => producto.estado_stock === "ROJO"
     );
 
+    // productosFiltrados aplica el filtro del selector sin modificar el array original
     const productosFiltrados = productos.filter((producto) => {
-        if (filtroStock === "TODOS") {
-            return true;
-        }
-
+        if (filtroStock === "TODOS") return true;
         return producto.estado_stock === filtroStock;
     });
 
@@ -270,6 +262,10 @@ function AdminInventario() {
 
                     <button className="active" type="button">
                         <FaBoxOpen /> Inventario
+                    </button>
+
+                    <button type="button" onClick={() => navigate("/admin/usuarios")}>
+                        <FaUsers /> Usuarios
                     </button>
 
                     <button type="button" onClick={() => navigate("/")}>
@@ -504,6 +500,7 @@ function AdminInventario() {
                 </Container>
             </main>
 
+            {/* Modal para registrar movimientos de stock (ENTRADA o SALIDA) */}
             <Modal show={mostrarModal} onHide={cerrarModal} centered>
                 <Form onSubmit={registrarMovimiento}>
                     <Modal.Header closeButton>
@@ -596,6 +593,8 @@ function AdminInventario() {
                     </Modal.Footer>
                 </Form>
             </Modal>
+
+            {/* Modal para editar los umbrales del semáforo de stock */}
             <Modal show={mostrarModalUmbrales} onHide={cerrarModalUmbrales} centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Editar semáforo de stock</Modal.Title>
@@ -664,7 +663,6 @@ function AdminInventario() {
                 </Form>
             </Modal>
         </div>
-
     );
 }
 

@@ -11,6 +11,7 @@ function Carrito() {
 
   const navigate = useNavigate();
 
+  // El carrito se lee desde localStorage al montar el componente
   useEffect(() => {
     cargarCarrito();
   }, []);
@@ -24,6 +25,7 @@ function Carrito() {
     return items.reduce((total, item) => total + item.subtotal_linea, 0);
   };
 
+  // El total ya incluye IVA; el subtotal neto se obtiene dividiendo por 1.19
   const calcularSubtotal = () => {
     return Math.round(calcularTotal() / 1.19);
   };
@@ -32,58 +34,55 @@ function Carrito() {
     return calcularTotal() - calcularSubtotal();
   };
 
-const aumentarCantidad = (idProducto) => {
-  const nuevoCarrito = items.map((item) => {
-    if (item.id_producto === idProducto) {
-      const nuevaCantidad = item.cantidad + 1;
+  const aumentarCantidad = (idProducto) => {
+    const nuevoCarrito = items.map((item) => {
+      if (item.id_producto === idProducto) {
+        const nuevaCantidad = item.cantidad + 1;
+        return {
+          ...item,
+          cantidad: nuevaCantidad,
+          subtotal_linea: nuevaCantidad * item.precio
+        };
+      }
+      return item;
+    });
 
-      return {
-        ...item,
-        cantidad: nuevaCantidad,
-        subtotal_linea: nuevaCantidad * item.precio
-      };
-    }
+    localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
+    setItems(nuevoCarrito);
 
-    return item;
-  });
+    // Se dispara carritoActualizado para que la Navbar actualice el contador en tiempo real
+    window.dispatchEvent(new Event("carritoActualizado"));
+  };
 
-  localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
-  setItems(nuevoCarrito);
+  const disminuirCantidad = (idProducto) => {
+    const nuevoCarrito = items.map((item) => {
+      if (item.id_producto === idProducto) {
+        const nuevaCantidad = item.cantidad - 1;
+        return {
+          ...item,
+          cantidad: nuevaCantidad,
+          subtotal_linea: nuevaCantidad * item.precio
+        };
+      }
+      return item;
+    });
 
-  window.dispatchEvent(new Event("carritoActualizado"));
-};
+    localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
+    setItems(nuevoCarrito);
 
-const disminuirCantidad = (idProducto) => {
-  const nuevoCarrito = items.map((item) => {
-    if (item.id_producto === idProducto) {
-      const nuevaCantidad = item.cantidad - 1;
+    window.dispatchEvent(new Event("carritoActualizado"));
+  };
 
-      return {
-        ...item,
-        cantidad: nuevaCantidad,
-        subtotal_linea: nuevaCantidad * item.precio
-      };
-    }
+  const eliminarItem = (idProducto) => {
+    const nuevoCarrito = items.filter(
+      (item) => item.id_producto !== idProducto
+    );
 
-    return item;
-  });
+    localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
+    setItems(nuevoCarrito);
 
-  localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
-  setItems(nuevoCarrito);
-
-  window.dispatchEvent(new Event("carritoActualizado"));
-};
-
-const eliminarItem = (idProducto) => {
-  const nuevoCarrito = items.filter(
-    (item) => item.id_producto !== idProducto
-  );
-
-  localStorage.setItem("carrito", JSON.stringify(nuevoCarrito));
-  setItems(nuevoCarrito);
-
-  window.dispatchEvent(new Event("carritoActualizado"));
-};
+    window.dispatchEvent(new Event("carritoActualizado"));
+  };
 
   const vaciarCarrito = () => {
     localStorage.removeItem("carrito");
@@ -103,15 +102,16 @@ const eliminarItem = (idProducto) => {
       const usuarioGuardado = localStorage.getItem("usuario");
       const usuario = usuarioGuardado ? JSON.parse(usuarioGuardado) : null;
 
+      // Se construye el payload con los datos del usuario (si hay sesión) o como invitado
       const payload = {
-        idUsuario: usuario ? usuario.idUsuario : null,
-        idCliente: 1,
-        idEmpresa: 1,
+        idUsuario:   usuario ? usuario.idUsuario : null,
+        idCliente:   1,
+        idEmpresa:   1,
         tipoCliente: usuario ? "REGISTRADO" : "INVITADO",
         tipoEntrega: "RETIRO_TIENDA",
         items: items.map((item) => ({
-          idProducto: item.id_producto,
-          cantidad: item.cantidad,
+          idProducto:    item.id_producto,
+          cantidad:      item.cantidad,
           precioUnitario: item.precio,
           subtotalLinea: item.subtotal_linea
         }))
@@ -119,6 +119,7 @@ const eliminarItem = (idProducto) => {
 
       const response = await api.post("/ventas/confirmar-directa", payload);
 
+      // Tras confirmar, se vacía el carrito y se redirige a la boleta con los datos en state
       localStorage.removeItem("carrito");
 
       navigate(`/venta-confirmada/${response.data.idVenta}`, {
@@ -186,29 +187,27 @@ const eliminarItem = (idProducto) => {
                 <tr key={item.id_producto}>
                   <td>{item.nombre_producto}</td>
                   <td className="text-center">
-  <div className="d-flex justify-content-center align-items-center gap-2">
+                    <div className="d-flex justify-content-center align-items-center gap-2">
+                      <Button
+                        variant="outline-secondary"
+                        size="sm"
+                        onClick={() => disminuirCantidad(item.id_producto)}
+                        disabled={item.cantidad <= 1}
+                      >
+                        -
+                      </Button>
 
-    <Button
-      variant="outline-secondary"
-      size="sm"
-      onClick={() => disminuirCantidad(item.id_producto)}
-      disabled={item.cantidad <= 1}
-    >
-      -
-    </Button>
+                      <span className="fw-bold">{item.cantidad}</span>
 
-    <span className="fw-bold">{item.cantidad}</span>
-
-    <Button
-      variant="outline-secondary"
-      size="sm"
-      onClick={() => aumentarCantidad(item.id_producto)}
-    >
-      +
-    </Button>
-
-  </div>
-</td>
+                      <Button
+                        variant="outline-secondary"
+                        size="sm"
+                        onClick={() => aumentarCantidad(item.id_producto)}
+                      >
+                        +
+                      </Button>
+                    </div>
+                  </td>
                   <td className="text-end">
                     ${item.precio.toLocaleString("es-CL")}
                   </td>

@@ -9,16 +9,20 @@ function VentaConfirmada() {
   const { idVenta } = useParams();
   const location = useLocation();
 
+  // location.state permite recibir los datos de la venta directamente desde Carrito.js
+  // sin necesidad de hacer una nueva consulta a la API
   const ventaDesdeState = location.state?.venta;
 
   const [ventaData, setVentaData] = useState(ventaDesdeState || null);
+
+  // Solo se muestra el spinner si no llegaron datos por state (ej: acceso directo por URL)
   const [cargando, setCargando] = useState(!ventaDesdeState);
   const [error, setError] = useState("");
 
   useEffect(() => {
     const cargarVenta = async () => {
       if (ventaDesdeState) {
-        return;
+        return; // Ya tenemos los datos, no se consulta la API
       }
 
       try {
@@ -46,6 +50,7 @@ function VentaConfirmada() {
   }, [idVenta, ventaDesdeState]);
 
   const verXml = () => {
+    // Abre el XML en una nueva pestaña del navegador
     window.open(`http://localhost:3001/api/ventas/${idVenta}/xml`, "_blank");
   };
 

@@ -87,6 +87,24 @@ const UsuarioModel = {
     db.run(sql, [passwordEncriptada, idUsuario], function (error) {
       callback(error, this?.changes);
     });
+  },
+
+  // Actualiza el rol de un usuario (CLIENTE o ADMIN).
+  // Solo el panel de administración puede ejecutar esta acción
+  actualizarRol: (idUsuario, rol, callback) => {
+    const sql = `UPDATE usuario SET rol = ? WHERE id_usuario = ?`;
+    db.run(sql, [rol, idUsuario], function (error) {
+      callback(error, this?.changes);
+    });
+  },
+
+  // Actualiza el estado de un usuario (ACTIVO o INACTIVO).
+  // Un usuario INACTIVO no puede iniciar sesión en el sistema
+  actualizarEstado: (idUsuario, estado, callback) => {
+    const sql = `UPDATE usuario SET estado = ? WHERE id_usuario = ?`;
+    db.run(sql, [estado, idUsuario], function (error) {
+      callback(error, this?.changes);
+    });
   }
 };
 

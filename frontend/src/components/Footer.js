@@ -2,6 +2,8 @@ import { Container, Row, Col } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { FaPaw, FaMapMarkerAlt, FaPhoneAlt, FaEnvelope, FaCreditCard } from "react-icons/fa";
 
+// Componente estático que muestra navegación, contacto y medios de pago.
+// Se renderiza en todas las páginas públicas a través del componente Layout
 function Footer() {
   return (
     <footer className="footer-puppy py-5">

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+// useParams extrae el id del producto desde la URL: /producto/:idProducto
 import { useParams, Link } from "react-router-dom";
 import {
   Container,
@@ -50,6 +51,7 @@ function ProductoDetalle() {
       return;
     }
 
+    // Se limita la cantidad al stock disponible para que el usuario no pueda pedir más de lo que hay
     if (producto?.stock && nuevaCantidad > producto.stock) {
       setCantidad(producto.stock);
       return;
@@ -67,6 +69,7 @@ function ProductoDetalle() {
 
     let nuevoCarrito;
 
+    // Si el producto ya está en el carrito, se suma la cantidad seleccionada en lugar de duplicarlo
     if (productoExistente) {
       nuevoCarrito = carritoActual.map((item) =>
         item.id_producto === producto.id_producto
